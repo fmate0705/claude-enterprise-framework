@@ -1,0 +1,18 @@
+# Enforce LF line endings for all text so the build/format gate is reproducible
+# across platforms (Principle 14; AS-020 VLP-02). Prettier enforces LF; this keeps
+# working-copy checkouts from being rewritten to CRLF on Windows.
+* text=auto eol=lf
+
+# Lockfiles and generated metadata: LF, and treat as generated in diffs.
+pnpm-lock.yaml linguist-generated=true eol=lf
+
+# Binary assets: never normalize.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+*.woff binary
+*.woff2 binary
