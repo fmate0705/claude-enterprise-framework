@@ -1,0 +1,113 @@
+# Component Engine Policy
+# Framework: CEF · Specification: AS-007 (Component Engine) · Version: 0.1.0
+# Machine-readable policy mirroring .claude/standards/components/.
+# This file is authoritative for taxonomy, dependencies, naming, folders,
+# accessibility, and library usage. Values MUST match the documentation.
+
+policy: component-engine
+version: 0.1.0
+appliesTo: "**/*.{tsx,jsx}"
+
+default_component_library: shadcn/ui
+
+# Component taxonomy (standards/components/taxonomy.md).
+# Dependencies flow downward only: a category may compose equal or lower tiers.
+taxonomy:
+  - id: primitive
+    tier: 1
+    location: components/ui/
+    owner: frontend-engineer
+    allowed: [design-tokens, lib, primitive]
+    forbidden: [features, business-logic, data-fetching, application-state]
+  - id: layout
+    tier: 2
+    location: components/
+    owner: frontend-engineer
+    allowed: [design-tokens, primitive]
+    forbidden: [features, business-logic, data-fetching]
+  - id: navigation
+    tier: 2
+    location: components/
+    owner: frontend-engineer
+    allowed: [design-tokens, primitive, layout]
+    forbidden: [business-logic, data-fetching]
+  - id: business
+    tier: 3
+    location: components/
+    owner: frontend-engineer
+    allowed: [design-tokens, primitive, layout]
+    forbidden: [data-fetching, cross-feature-internals]
+  - id: section
+    tier: 3
+    location: components/
+    owner: frontend-engineer
+    allowed: [primitive, layout, navigation, business]
+    forbidden: [data-fetching, feature-internals]
+  - id: feature
+    tier: 4
+    location: features/*/components/
+    owner: frontend-and-backend-engineer
+    allowed: [primitive, layout, business, feature-hooks, feature-lib]
+    forbidden: [other-feature-internals, pages]
+  - id: application-shell
+    tier: 4
+    location: components/
+    owner: frontend-engineer
+    allowed: [primitive, layout, navigation]
+    forbidden: [business-logic, data-fetching]
+  - id: template
+    tier: 5
+    location: app/
+    owner: frontend-engineer
+    allowed: [primitive, layout, navigation, section, application-shell]
+    forbidden: [data-fetching, business-logic]
+  - id: page
+    tier: 6
+    location: app/**/page.tsx
+    owner: frontend-engineer
+    allowed: [any-lower-tier, server-data]
+    forbidden: [inline-domain-logic, inline-data-access]
+
+dependency_rules:
+  direction: downward-only        # higher tier may compose lower; never upward
+  cross_feature_internal_imports: forbidden
+  server_import_in_client: forbidden
+  one_category_per_component: required
+
+naming:
+  component: PascalCase
+  component_file: PascalCase.tsx
+  folder: kebab-case
+  exports: named                  # anonymous default exports forbidden (except route files)
+  public_entry: index.ts
+
+folders:
+  colocate: [component, types, tests, subcomponents]
+  public_entry_required: true
+  internal_import_from_outside: forbidden
+  private_subcomponents_dir: parts/
+
+accessibility:
+  standard: WCAG_2.2_AA
+  status: floor                   # never waived without a recorded, scoped user waiver
+  keyboard_operable: required
+  visible_focus: required
+  accessible_name: required
+  color_not_sole_signal: required
+
+styling:
+  source: design-tokens           # tokens only; hard-coded values forbidden
+  hard_coded_values: forbidden
+
+premium_ui_libraries:
+  order: [shadcn/ui, magic-ui, aceternity-ui, 21st.dev, origin-ui]
+  rules:
+    prefer_composition_over_copying: required
+    paste_unrefactored_examples: forbidden
+    re_tokenize_on_import: required
+    review_every_import: required
+  shadcn_integration:
+    use_unchanged_when_fits: required
+    wrap_not_fork: required
+    custom_only_when_justified: required
+    theme_via_tokens: required

@@ -1,0 +1,47 @@
+# Schema (Structured Data) Policy
+# Framework: CEF · Specification: AS-010 (Discoverability Engine) · Version: 0.1.0
+# Canonical structured-data requirements. Single source of truth for
+# discoverability/structured-data.md. Documentation MUST match these values.
+
+policy: schema
+version: 0.1.0
+
+format: json-ld
+rules:
+  valid_schema_org: required
+  match_visible_content: required     # no fabrication
+  correct_type: required
+  one_primary_type_per_page: required
+  validate_before_ship: required
+  no_fabricated_ratings: required
+
+# Recognized types and their required fields (discoverability/structured-data.md).
+types:
+  WebSite:            { required: [name, url], optional: [potentialAction] }
+  Organization:       { required: [name, url, logo], optional: [sameAs, contactPoint] }
+  LocalBusiness:      { required: [name, address, telephone], optional: [geo, openingHours, priceRange] }
+  WebPage:            { required: [name, url], optional: [breadcrumb, primaryImageOfPage] }
+  BreadcrumbList:     { required: [itemListElement] }
+  Article:            { required: [headline, author, datePublished], optional: [dateModified, image, publisher] }
+  FAQPage:            { required: [mainEntity] }
+  Product:            { required: [name, image, offers], optional: [brand, aggregateRating, review] }
+  Service:            { required: [name, provider], optional: [areaServed, offers] }
+  Person:             { required: [name], optional: [jobTitle, sameAs, image] }
+  Event:              { required: [name, startDate, location], optional: [endDate, offers, performer] }
+  SoftwareApplication:{ required: [name, applicationCategory], optional: [offers, aggregateRating, operatingSystem] }
+  Review:             { required: [itemReviewed, reviewRating, author], optional: [datePublished] }
+  HowTo:              { required: [name, step], optional: [totalTime, supply, tool] }
+
+# Typical primary type by page type (guidance).
+primary_by_page:
+  site_root: WebSite
+  organization: Organization
+  location: LocalBusiness
+  article_or_post: Article
+  product: Product
+  service: Service
+  faq: FAQPage
+  profile: Person
+  event: Event
+  app_or_saas: SoftwareApplication
+  guide: HowTo

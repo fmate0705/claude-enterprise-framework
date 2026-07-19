@@ -1,0 +1,163 @@
+# AI Policy
+# Framework: CEF · Specification: AS-019 (AI Intelligence Platform Engine) · Version: 2.0.0
+# Canonical source of truth for AI architecture: capabilities, provider abstraction,
+# model selection, context management, multimodal, cost, latency, streaming, caching,
+# observability, and the AI review gate.
+#
+# SCOPE. This engine governs AI capabilities in PRODUCTS BUILT WITH CEF. It does not
+# govern how CEF itself operates (runtime/, rules/, tool-engine.md).
+# Boundaries. Prompts -> prompt.policy. Product memory -> memory.policy (policies/).
+# Retrieval -> rag.policy. Agents/tools/MCP -> agents.policy. Guardrails -> safety.policy.
+# Evaluation -> evaluation.policy. Security model -> security.policy (AS-016).
+# Privacy/consent/retention -> privacy.policy (AS-016). Log transport -> operations/
+# logging.md (AS-014). Analytics collection -> operations/analytics.md (AS-014).
+# Documentation MUST match these values.
+
+policy: ai
+version: 2.0.0
+
+# --- Capabilities. Every AI feature resolves to at least one.
+capabilities:
+  - conversational
+  - retrieval-augmented-generation
+  - knowledge-search
+  - document-qa
+  - semantic-search
+  - assistants
+  - workflow-automation
+  - reasoning
+  - classification
+  - extraction
+  - summarization
+  - translation
+  - vision
+  - speech
+  - code-generation
+  - image-generation
+  - multimodal
+
+capability_requirements:
+  purpose_stated: required
+  success_criteria_defined: required     # evaluation.policy
+  trade_offs_recorded: required
+  simplest_sufficient_capability: required
+  ai_where_deterministic_code_suffices: forbidden
+
+# --- Provider abstraction. The durable asset is the architecture, not the vendor.
+provider:
+  mandated_provider: none
+  behind_typed_interface: required
+  provider_types_in_domain: forbidden
+  swappable_without_domain_rewrite: required
+  selection_recorded: required           # memory/decisions.md
+  integration_follows_official_docs: required
+  supported_shapes: [hosted-api, self-hosted-inference, hybrid]
+  capability_detection_at_boundary: required
+  capability_assumed_from_provider: forbidden
+  provider_credentials_in_client: forbidden   # SM-05
+  responses_validated_at_boundary: required   # IV-26
+
+routing:
+  routing_rule_documented: required
+  routing_deterministic: required
+  fallback_provider_defined: recommended
+  fallback_degrades_explicitly: required
+  fallback_silently_changes_quality: forbidden
+  fallback_on_policy_refusal_distinguished_from_outage: required
+  routing_decision_logged: required
+
+model_selection:
+  selection_criteria_documented: required
+  criteria: [capability-fit, context-window, latency, cost, availability, data-handling]
+  model_pinned_explicitly: required
+  floating_model_reference_in_production: forbidden
+  model_change_is_a_change: required     # re-evaluate before promoting
+  model_change_without_evaluation: forbidden
+  capability_verified_not_assumed: required
+  deprecation_path_monitored: required
+
+# --- Context. Context quality determines output quality.
+context:
+  window_limit_known_at_runtime: required
+  budget_defined_per_capability: required
+  overflow_handled_explicitly: required
+  silent_truncation: forbidden
+  truncation_from_the_middle_undeclared: forbidden
+  prioritization_rule_documented: required
+  compression_lossy_and_declared: required
+  summarization_is_lossy: acknowledged
+  irrelevant_context_degrades_output: acknowledged
+  more_context_assumed_better: forbidden
+  expiry_defined: required
+
+multimodal:
+  modality_declared_per_capability: required
+  input_validated_by_content: required   # FU-04
+  size_bounded: required
+  unsupported_modality_fails_explicitly: required
+  vision_output_treated_as_assertion: required   # never as ground truth
+  speech_transcript_confidence_surfaced: recommended
+  generated_media_labelled: required
+  generated_media_provenance_recorded: required
+
+# --- Cost. Ignoring cost is a design decision made by accident.
+cost:
+  budget_defined_per_capability: required
+  token_accounting_instrumented: required
+  cost_attributed_per_feature: required
+  cost_per_request_bounded: required
+  runaway_loop_guard: required
+  unbounded_retry: forbidden
+  cheapest_sufficient_model: required
+  caching_evaluated: required
+  cost_monitored_and_alerted: required   # monitoring.policy
+  cost_regression_blocks_release: required
+
+latency:
+  target_defined_per_capability: required
+  timeout_set_on_every_call: required    # E-049
+  perceived_latency_addressed: required
+  streaming_for_long_output: required
+  latency_budget_includes_retrieval_and_tools: required
+  latency_monitored: required
+  latency_regression_blocks_release: required
+
+streaming:
+  used_when_output_is_long_or_user_facing: required
+  partial_output_handled: required
+  interruption_handled: required
+  partial_output_treated_as_complete: forbidden
+  stream_errors_surfaced: required
+
+caching:
+  cache_strategy_recorded: required
+  cache_key_includes_every_input_affecting_output: required
+  stale_cache_across_prompt_version: forbidden   # prompt.policy.versioning
+  stale_cache_across_model_change: forbidden
+  cache_respects_authorization: required        # AZ-12
+  personal_data_in_shared_cache: forbidden
+  semantic_cache_similarity_threshold_recorded: required
+  cache_hit_rate_measured: required
+
+observability:
+  every_call_traceable: required
+  trace_includes: [capability, model, prompt_version, latency, tokens, cost, outcome]
+  correlation_id_propagated: required
+  failures_surfaced: required            # E-075
+  silent_degradation: forbidden
+
+skills:
+  ai_interface_layout: frontend-design-skill    # TE-02
+  ai_interface_ux: ui-ux-pro-max                # TE-05
+  workflow_hierarchy: taste-skill               # TE-01
+  browser_validation: chrome-devtools-mcp       # TE-08
+  multimodal_assets: higgsfield-mcp             # TE-09
+  runtime_selection_authority: runtime/skill-manager.md   # AS-015
+
+review:
+  gate: ai-review
+  areas: [prompt-quality, context-management, memory, retrieval, guardrails, performance, privacy, cost, reliability, human-oversight]
+  checklist: checklists/ai.md
+  anti_patterns: hard-fail
+  floors: [accessibility, security, privacy, legal]
+  waiver: recorded-scoped-user-decision-only

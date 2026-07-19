@@ -1,0 +1,74 @@
+# Authorization Policy
+# Framework: CEF · Specification: AS-016 (Security & Compliance Engine) · Version: 2.0.0
+# Canonical source of truth for access control: models, enforcement point, ownership,
+# and privileged actions. Absorbed exposure.least_privilege from AS-014
+# operational-security@0.1.0.
+# Consumed by: standards/security/{authorization,audit-logging}.md, checklists/security.md.
+# Documentation MUST match these values.
+
+policy: authorization
+version: 2.0.0
+
+principles:
+  default_deny: required            # absence of a rule denies
+  least_privilege: required
+  complete_mediation: required      # every request checked, every time
+  fail_closed: required
+
+enforcement:
+  server_side: required
+  client_side_as_control: forbidden        # UI hiding is presentation, never enforcement
+  checked_at_every_entry_point: required
+  checked_per_request: required
+  centralized_decision_point: required
+  scattered_ad_hoc_checks: forbidden
+  cached_decisions_bounded: required
+  deny_logged: required
+
+models:
+  # No single model is mandated; selection criteria are in security/authorization.md.
+  supported: [rbac, abac, relationship-based]
+  default: rbac
+  rbac_when: roles-are-stable-and-coarse-grained
+  abac_when: decisions-depend-on-attributes-or-context
+  relationship_based_when: access-derives-from-ownership-graphs
+  model_recorded_in: memory/decisions.md
+
+roles:
+  explicitly_enumerated: required
+  role_explosion: avoid
+  implicit_superuser: forbidden
+  admin_role_separate_from_user_role: required
+  role_assignment_audited: required
+
+resource_ownership:
+  ownership_verified_server_side: required
+  identifier_in_request_trusted: forbidden   # IDOR is the default failure mode
+  object_level_check: required               # not just endpoint-level
+  scoped_queries_by_principal: required
+  unscoped_query_then_filter_in_app: forbidden
+
+tenancy:
+  tenant_isolation_enforced_server_side: required
+  tenant_id_from_session_not_request: required
+  cross_tenant_access: forbidden-without-explicit-grant
+
+privileged_actions:
+  reauthentication: required                # authentication.policy.privileged_access
+  authorization_check_server_side: required
+  audit_logged: required                    # who, what, when, outcome
+  destructive_action_confirmable: required
+  unlogged_privileged_mutation: forbidden
+
+api:
+  every_endpoint_has_explicit_authz: required
+  public_endpoint_explicitly_marked: required
+  authentication_without_authorization: forbidden   # authn is not authz
+  mass_assignment_defense: required
+  field_level_authorization: required-for-sensitive-fields
+
+verification:
+  negative_tests_required: required         # prove denial, not only permission
+  privilege_escalation_tested: required
+  idor_tested: required
+  gate: security-review

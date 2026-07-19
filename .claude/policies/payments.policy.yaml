@@ -1,0 +1,115 @@
+# Payments Policy
+# Framework: CEF · Specification: AS-017 (Commerce Platform Engine) · Version: 2.0.0
+# Canonical source of truth for payment integration: provider isolation, card-data
+# posture, idempotency, webhooks, refunds, failures, and reconciliation.
+#
+# Boundaries. No provider is mandated (AS-014 provider neutrality). Transport, secrets,
+# and webhook signature verification are owned by M-SEC (security.policy; IV-25, API-22).
+# Order states are owned by orders.policy.yaml. Money is owned by pricing.policy.yaml.
+# Consumed by: standards/commerce/{payments,refunds,subscriptions,invoicing}.md.
+# Documentation MUST match these values.
+
+policy: payments
+version: 2.0.0
+
+# --- Provider neutrality. Specific integrations follow their official documentation.
+provider:
+  mandated_provider: none
+  isolated_behind_typed_interface: required   # server/payments per architecture archetype
+  provider_types_leaking_into_domain: forbidden
+  swappable_without_domain_rewrite: required
+  provider_selection_recorded: required       # memory/decisions.md
+  integration_follows_official_docs: required
+  provider_sdk_in_client_bundle: only-provider-hosted-fields
+
+# --- Card data. The cheapest compliance posture is not to touch it.
+card_data:
+  raw_card_data_touches_server: forbidden
+  provider_hosted_fields_or_redirect: required
+  pan_stored: forbidden
+  cvv_stored: forbidden
+  card_data_logged: forbidden                 # security.policy.logging, LOG-07
+  card_data_in_analytics: forbidden
+  tokenized_reference_only: required
+  scope_reduction_is_the_goal: required
+
+amounts:
+  authoritative_source: server                # pricing.policy.price
+  amount_from_client: forbidden
+  currency_explicit: required
+  amount_matches_order: required
+
+# --- Idempotency. The defense against duplicate charges.
+idempotency:
+  key_required_on_every_charge: required
+  key_stable_across_retries: required
+  key_derived_from_intent_not_timestamp: required
+  duplicate_charge_on_retry: forbidden
+  duplicate_charge_on_network_timeout: forbidden
+  retry_without_idempotency_key: forbidden
+
+# --- Webhooks. The payment result is authoritative here, not in the browser.
+webhooks:
+  signature_verified: required                # security.policy; API-22
+  raw_body_used_for_verification: required
+  constant_time_comparison: required
+  timestamp_window_enforced: required
+  replay_rejected: required
+  idempotent_processing: required             # providers deliver more than once
+  out_of_order_delivery_tolerated: required
+  processed_asynchronously: required
+  fast_acknowledgement: required              # ack, then process
+  failure_retried_with_backoff: required
+  unverified_webhook_trusted: forbidden
+  client_redirect_as_proof_of_payment: forbidden   # the browser is not the source of truth
+
+fulfilment_trigger:
+  authoritative_signal: verified-provider-confirmation
+  fulfil_on_client_callback: forbidden
+  fulfil_before_payment_confirmed: forbidden
+
+failures:
+  reason_surfaced_actionably: required
+  raw_provider_error_to_customer: forbidden
+  cart_preserved: required
+  retry_available: required
+  soft_decline_retry_supported: required
+  hard_decline_retried_blindly: forbidden
+  failure_logged: required
+  failure_rate_alerted: required              # monitoring.policy
+
+saved_payment_methods:
+  stored_as_provider_token: required
+  explicit_customer_consent_to_save: required
+  save_by_default: forbidden
+  removable_by_customer: required
+  reauthentication_to_manage: required        # AUTH-11
+  usable_without_customer_present_only_when_agreed: required
+
+strong_authentication:
+  supported: required                         # 3DS / SCA where applicable
+  challenge_flow_handled: required
+  challenge_abandonment_handled: required
+
+refunds:
+  server_side_authorized: required            # AZ-18
+  audit_logged: required                      # AL-02
+  refund_exceeds_captured_amount: forbidden
+  partial_refund_supported: required
+  refund_reflected_in_order_state: required   # orders.policy
+  refund_confirmation_sent: required
+  double_refund_prevented: required
+
+# --- Reconciliation. Money that is not reconciled is money that is wrong.
+reconciliation:
+  provider_records_reconciled_with_orders: required
+  cadence: at-least-daily
+  discrepancy_alerted: required
+  charge_without_order_detected: required
+  order_without_charge_detected: required
+  reconciliation_evidence_retained: required
+
+review:
+  gate: commerce-review
+  anti_patterns: hard-fail
+  waiver: recorded-scoped-user-decision-only

@@ -1,0 +1,112 @@
+# Pricing Policy
+# Framework: CEF · Specification: AS-017 (Commerce Platform Engine) · Version: 2.0.0
+# Canonical source of truth for money representation, price display, tax presentation,
+# discounts, and coupons.
+#
+# Boundaries. Currency FORMATTING (symbol placement, separators) is canonical in
+# localization.policy.yaml (locale_formats.currency); this file owns money
+# REPRESENTATION and arithmetic. Pricing-page section order is owned by
+# content.policy.yaml (page_sections.pricing). CTA hierarchy and anti-manipulation
+# rules are owned by conversion.policy.yaml (AS-008).
+# Consumed by: standards/commerce/{pricing,discounts,coupons,currencies,taxes}.md.
+# Documentation MUST match these values.
+
+policy: pricing
+version: 2.0.0
+
+# --- Money representation. The most consequential rule in this engine.
+money:
+  storage: integer-minor-units       # 1050 == 10.50, never 10.5
+  floating_point_for_money: forbidden  # binary floats cannot represent 0.10 exactly
+  currency_always_attached: required   # an amount without a currency is meaningless
+  arithmetic: integer-only
+  rounding_mode: half-up
+  rounding_at: single-defined-point    # never round twice
+  precision_from_currency: required    # JPY has 0 minor units; not every currency has 2
+  amount_as_string_in_transport: preferred
+  client_computed_price_trusted: forbidden   # authoritative price is server-side
+
+price:
+  authoritative_source: server
+  recalculated_at_checkout: required
+  price_from_client_request: forbidden
+  price_change_during_checkout_surfaced: required
+  historical_price_retained_on_order: required   # orders are immutable records
+
+display:
+  currency_visible: required
+  format_ref: localization.policy.locale_formats.currency
+  tax_inclusivity_stated: required     # "incl. VAT" / "excl. VAT" is never implicit
+  price_without_currency: forbidden
+  strikethrough_requires_real_prior_price: required
+  fabricated_reference_price: forbidden
+  per_unit_price_when_relevant: required
+  free_means_zero_total: required
+
+# --- Total transparency. The engine's central trust rule.
+total_transparency:
+  all_mandatory_costs_before_payment: required
+  final_total_before_payment_step: required
+  hidden_fees: forbidden
+  surprise_at_final_step: forbidden
+  shipping_cost_known_before_payment: required
+  tax_shown_before_payment: required
+  unavoidable_fee_excluded_from_advertised_price: forbidden
+  estimate_labelled_as_estimate: required
+
+tiers:
+  tier_boundaries_explicit: required
+  overlapping_tiers: forbidden
+  volume_break_shown: required
+  tier_applied_deterministically: required   # same inputs, same tier, always
+
+sale_pricing:
+  prior_price_genuine: required
+  sale_end_stated_when_claimed: required
+  permanent_sale_presented_as_temporary: forbidden
+  fake_countdown: forbidden
+  fake_scarcity: forbidden
+
+discounts:
+  stacking_rules_explicit: required
+  stacking_default: not-stackable
+  application_order_defined: required     # deterministic outcome
+  discount_before_tax_or_after_defined: required
+  negative_total: forbidden
+  discount_validated_server_side: required
+  client_supplied_discount_trusted: forbidden
+  reason_shown_on_rejection: required
+  max_discount_bound: required
+
+coupons:
+  validated_server_side: required
+  case_insensitive_match: required
+  whitespace_trimmed: required
+  single_use_enforced_atomically: required   # race conditions issue duplicates
+  expiry_enforced: required
+  usage_limit_enforced: required
+  per_customer_limit_supported: required
+  minimum_spend_stated: required
+  eligibility_stated_before_apply: required
+  silent_failure: forbidden
+  enumeration_resistant: required           # rate-limited; see security.policy
+  code_removable_by_customer: required
+
+subscription_pricing:
+  recurring_amount_stated: required
+  billing_interval_stated: required
+  first_charge_date_stated: required
+  renewal_amount_stated_when_differs: required   # intro price ending is a disclosure
+  trial_terms_stated: required
+  cancellation_terms_stated_before_purchase: required
+
+regional_pricing:
+  currency_per_region_supported: required
+  region_derived_deterministically: required
+  price_changes_on_region_switch_surfaced: required
+  tax_treatment_per_region_defined: required
+
+review:
+  gate: commerce-review
+  anti_patterns: hard-fail
+  waiver: recorded-scoped-user-decision-only

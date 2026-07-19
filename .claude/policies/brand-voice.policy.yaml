@@ -1,0 +1,38 @@
+# Brand Voice Policy
+# Framework: CEF · Specification: AS-011 (Content Intelligence Engine) · Version: 0.1.0
+# Canonical voice dimensions and vocabulary rules. Single source of truth for
+# content/brand-voice.md. Per-project values are recorded in memory/branding.md.
+# Documentation MUST match these dimensions.
+
+policy: brand-voice
+version: 0.1.0
+
+# Dimensions a project MUST define before substantive copy (recorded in
+# memory/branding.md). Values are project-specific; these are the required slots.
+voice_dimensions:
+  - mission
+  - values
+  - personality
+  - voice
+  - tone            # see tone.policy
+  - vocabulary
+  - writing_style
+  - reading_level   # see content.policy.readability.reading_grade_target
+  - sentence_structure
+
+rules:
+  define_before_writing: required
+  one_voice_all_surfaces: required
+  personality_as_named_traits: required
+  human_not_robotic: required
+  real_client_inputs: required        # never fabricate voice/mission
+  document_adaptations: required       # sub-brand/audience adaptations recorded
+
+vocabulary:
+  preferred_terms: consistent
+  banned_terms: enforced
+  product_nomenclature: consistent-spelling-and-casing
+  ai_cliches: forbidden                # see content/anti-patterns CNAP-10..22
+
+consistency_check:
+  at_review: required                  # content/review.md CRW-04

@@ -1,0 +1,63 @@
+# Capability: Corporate Website
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+
+capability: corporate-site
+version: 1.0.0
+
+classification:
+  aliases: [corporate website, company website, business site, institutional site]
+  signals:
+    goal: inform-and-establish-credibility
+    audience: public-visitor
+    surfaces: many-pages
+    data: content-only
+    auth: none
+    commerce: none
+complexity_default: standard
+
+engines:
+  required:
+    - architecture
+    - platform
+    - components
+    - experience
+    - motion
+    - discoverability
+    - content
+    - assets
+    - quality
+    - operations
+  excluded: []
+
+skills: [taste-skill, frontend-design-skill, ui-ux-pro-max, seo-skill, nextjs-seo-skill]
+mcps: [chrome-devtools-mcp, higgsfield-mcp]
+
+legal_documents:                # legal is emphasized for corporate entities
+  - privacy-policy
+  - terms-of-service
+  - cookie-policy
+  - imprint
+  - accessibility-statement
+  hungarian_when_applicable: [aszf, adatkezelesi-tajekoztato, impresszum, cookie-tajekoztato]
+
+assets:
+  - logo-system
+  - og-image
+  - favicon-set
+  optional: [hero-image, team-photography, social-assets]
+
+workflow:
+  project_type: PT-B            # workflow-engine/project-types.md
+  states: all
+  emphasis: [S04, S12, S16]
+
+profiles:
+  architecture: corporate-site  # standards/architecture/project-types.md
+  density: comfortable          # experience.policy.yaml
+  motion_level: corporate       # motion.policy.yaml (default 2, ceiling 3)
+  page_sections: corporate_home # content.policy.yaml
+
+validation:
+  gates: all
+  emphasis: [discoverability, content, legal, accessibility]
+  release_verification: all

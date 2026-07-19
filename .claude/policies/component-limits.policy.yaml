@@ -1,0 +1,58 @@
+# Component Limits Policy
+# Framework: CEF · Specification: AS-007 (Component Engine) · Version: 0.1.0
+# Canonical numeric limits for components. These values are the single source
+# of truth and are referenced by standards/components/{folder-structure,props,
+# review,anti-patterns,validation}.md. Documentation MUST match these numbers.
+
+policy: component-limits
+version: 0.1.0
+appliesTo: "**/*.{tsx,jsx}"
+
+limits:
+  component_max_lines:
+    value: 200
+    severity: blocker
+    action: split-component
+    refs: [CFS-06, CRV-07, CVL-08, CAP-03]
+  jsx_max_nesting_depth:
+    value: 4
+    severity: major
+    action: extract-subcomponent
+    refs: [CRV-07, CVL-08, CAP-04]
+  props_max_count:
+    value: 7
+    severity: major
+    action: decompose-or-use-object-or-slots
+    refs: [CPR-06, CVL-03, CVL-08, CAP-02]
+  boolean_props_max:
+    value: 3
+    severity: major
+    action: use-variant-union-or-slots
+    refs: [CPR-05, CVL-03, CAP-02]
+  prop_drilling_max_depth:
+    value: 3
+    severity: major
+    action: use-composition-or-context
+    refs: [CPR-08]
+  max_cyclomatic_complexity:
+    value: 10
+    severity: major
+    action: refactor
+    refs: [CVL-08, LNT-07]
+
+accessibility_limits:
+  min_touch_target_px:
+    value: 44
+    severity: blocker
+    refs: [NV-06, CD-09, D-099]
+
+required_interactive_states:
+  value: [default, hover, focus, active, disabled, loading, error]
+  severity: blocker
+  refs: [CFS-contract, CD-09]
+
+enforcement:
+  gate: code-review          # workflow G09
+  on_blocker: block-completion
+  on_major: fix-before-completion
+  waiver: recorded-scoped-user-decision-only

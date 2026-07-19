@@ -1,0 +1,116 @@
+# Prompt Policy
+# Framework: CEF · Specification: AS-019 (AI Intelligence Platform Engine) · Version: 2.0.0
+# Canonical source of truth for the prompt lifecycle: layers, templates, variables,
+# versioning, testing, and libraries.
+#
+# SCOPE. Prompts in PRODUCTS BUILT WITH CEF. CEF's own instructions are the Constitution
+# and rules/ — not governed here.
+# Boundaries. Injection defense -> safety.policy + security.policy (AS-016).
+# Evaluation thresholds -> evaluation.policy. Copy voice/tone -> content/ (AS-011).
+# Documentation MUST match these values.
+
+policy: prompt
+version: 2.0.0
+
+# --- Layers. Each has a distinct trust level and author.
+layers:
+  system:
+    author: developer
+    trust: trusted
+    purpose: role-constraints-and-invariants
+  developer:
+    author: developer
+    trust: trusted
+    purpose: task-instructions-and-format
+  user:
+    author: end-user
+    trust: untrusted            # IV-01
+    purpose: the-request
+  tool_result:
+    author: external-system
+    trust: untrusted            # IV-26
+    purpose: retrieved-or-computed-data
+
+layer_rules:
+  system_prompt_required: required        # every AI call has one
+  layers_never_merged: required
+  user_content_in_system_layer: forbidden
+  untrusted_content_granted_instruction_authority: forbidden
+  trust_boundary_explicit: required       # SF-11
+  layer_of_origin_preserved: required
+
+system_prompts:
+  states_role_and_scope: required
+  states_refusal_boundaries: required
+  states_output_contract: required
+  secrets_in_prompt: forbidden            # SM-05
+  personal_data_in_prompt: minimize       # privacy.policy
+  credentials_in_prompt: forbidden
+  prompt_as_access_control: forbidden     # not a security boundary
+
+templates:
+  prompts_are_templates_not_string_concatenation: required
+  hardcoded_prompt_in_business_logic: forbidden
+  template_stored_as_an_artifact: required
+  variables_typed: required
+  variables_validated: required           # IV-04
+  variable_interpolation_escaped_for_layer: required
+  user_input_interpolated_into_instructions: forbidden
+  template_reviewed_as_code: required
+
+library:
+  shared_prompts_extracted: required      # E-002
+  prompt_duplication: forbidden
+  library_owner_named: required
+  library_documented: required
+
+# --- Versioning. A prompt change is a behavior change.
+versioning:
+  every_prompt_versioned: required
+  version_identifier_stable: required
+  version_recorded_on_every_call: required
+  version_in_trace: required              # ai.policy.observability
+  change_requires_evaluation: required    # evaluation.policy
+  change_without_evaluation: forbidden
+  rollback_supported: required
+  history_retained: required
+  editing_a_released_prompt_in_place: forbidden
+
+lifecycle:
+  states: [draft, evaluated, released, deprecated, retired]
+  transitions:
+    draft:      [evaluated]
+    evaluated:  [released, draft]
+    released:   [deprecated, draft]
+    deprecated: [retired, released]
+    retired:    []
+  release_requires_passing_evaluation: required
+  deprecated_prompt_still_serves_pinned_callers: required
+  retired_prompt_unreachable: required
+
+testing:
+  test_set_exists: required
+  regression_set_grows_from_failures: required
+  test_before_release: required
+  deterministic_where_possible: required
+  non_determinism_acknowledged: required  # same prompt, different output
+  golden_output_exact_match_as_sole_test: forbidden
+  edge_cases_tested: [empty, adversarial, over-long, wrong-language, injection]
+
+engineering:
+  instructions_specific_over_clever: required
+  examples_over_adjectives: preferred
+  output_format_stated: required
+  failure_behavior_stated: required       # what to do when it cannot answer
+  model_told_to_refuse_when_unsupported: required
+  prompt_encodes_business_rules: discouraged   # rules belong in code
+  prompt_bloat_reviewed: required
+
+portability:
+  provider_specific_syntax_isolated: required
+  prompt_tied_to_one_model_recorded: required
+  reprompting_cost_on_model_change_acknowledged: required
+
+review:
+  gate: ai-review
+  anti_patterns: hard-fail

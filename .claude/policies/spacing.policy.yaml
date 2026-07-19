@@ -1,0 +1,37 @@
+# Spacing Policy
+# Framework: CEF · Specification: AS-008 (Experience Engine) · Version: 0.1.0
+# Canonical spacing values. Single source of truth for experience/spacing.md.
+# Documentation MUST match these values.
+
+policy: spacing
+version: 0.1.0
+
+base_unit_px: 4
+rhythm_unit_px: 8
+
+scale_px: [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128]
+
+section_padding_px:
+  mobile: 64
+  tablet: 80
+  desktop_min: 96
+  desktop_max: 128
+  rule: equal-top-and-bottom
+
+group_gap_px:
+  related_min: 8
+  related_max: 16
+  unrelated_min: 24
+  unrelated_max: 48
+
+component_padding_px:
+  min: 16
+  max: 24
+  rule: one-inset-per-component-type
+
+page_margin_min_mobile_px: 16
+
+rules:
+  scale_only: required            # off-scale literals forbidden
+  whitespace_before_elements: required
+  negative_margin_hacks: forbidden   # allowed only for intentional overlap

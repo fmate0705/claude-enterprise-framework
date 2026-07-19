@@ -1,0 +1,67 @@
+# Deployment Policy
+# Framework: CEF · Specification: AS-014 (Delivery & Operations Engine) · Version: 0.1.0
+# Canonical CI/CD stages, promotion rules, and deployment requirements. Single source
+# of truth for operations/{ci-cd,github-actions,release-management,rollback}.md.
+# The release DECISION is owned by release.policy.yaml (AS-013) and referenced here.
+# Documentation MUST match these values.
+
+policy: deployment
+version: 0.1.0
+
+# Canonical pipeline (operations/ci-cd.md).
+pipeline_stages:
+  - pull-request
+  - lint
+  - type-check
+  - tests
+  - build
+  - docker-build
+  - security-scan
+  - preview-deployment
+  - approval
+  - production-deployment
+
+stage_rules:
+  fail_fast: required
+  same_pipeline_for_all: required       # no bypass path to production
+  frozen_lockfile_install: required
+  build_once_promote: required          # same image through environments
+  security_scan_blocks: required        # vulnerability/secret of consequence
+  preview_before_production: required
+  human_approval_for_production: required
+  post_deploy_verification: required    # health + key flows; failure -> rollback
+  pipeline_as_code: required
+  no_manual_production_steps: required
+  artifacts_traceable_to_commit: required
+  secrets_from_ci_store: required
+  secrets_in_logs: forbidden
+
+promotion:
+  order: [development, testing, staging, production]
+  skip_staging: forbidden               # hotfixes still pass the gates
+  production_requires:
+    - all-quality-gates-passed          # quality-gates.policy.yaml
+    - release-recommendation-approve-or-conditional   # release.policy.yaml
+    - explicit-human-approval
+    - tested-rollback
+
+rollback:
+  tested_before_release: required
+  triggers:
+    - health-check-failing
+    - error-rate-above-threshold        # monitoring.policy.yaml
+    - p95-latency-above-threshold       # monitoring.policy.yaml
+    - critical-defect-discovered
+    - data-integrity-at-risk
+  mechanism: redeploy-previous-known-good-image
+  single_automated_action: required
+  verify_after_rollback: required
+  record: memory/deployment.md
+
+release:
+  semver: required                      # operations/versioning.md
+  immutable_tag: required
+  release_notes: required
+  migration_docs_for_breaking: required
+  record: [memory/deployment.md, CHANGELOG.md]
+  decision_owner: release.policy.yaml

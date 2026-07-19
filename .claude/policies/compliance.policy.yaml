@@ -1,0 +1,111 @@
+# Compliance Policy
+# Framework: CEF · Specification: AS-016 (Security & Compliance Engine) · Version: 2.0.0
+# Canonical source of truth for regulatory awareness, evidence, and audit readiness.
+#
+# This file states NO legal conclusion and is NOT legal advice. It records which
+# obligations MAY apply and what engineering evidence is produced. Applicability is a
+# legal determination and MUST be made by qualified legal professionals.
+# Legal document CONTENT (ASZF, Adatkezelesi Tajekoztato, Impresszum, Cookie
+# Tajekoztato) is owned by content/legal-pages.md (AS-011).
+# Consumed by: standards/security/{compliance,legal-considerations}.md.
+# Documentation MUST match these values.
+
+policy: compliance
+version: 2.0.0
+
+posture:
+  compliance_is_a_floor: required
+  claims_without_evidence: forbidden
+  certification_claimed_without_audit: forbidden
+  legal_conclusions_by_the_framework: forbidden
+  qualified_legal_review_before_publication: required
+
+# --- Regimes that MAY apply. Applicability is determined by qualified counsel.
+regimes:
+  privacy:
+    - name: GDPR
+      may_apply_when: processing-personal-data-of-eu-ea-data-subjects
+      engineering_support: privacy.policy
+    - name: Hungarian data protection (Info tv.)
+      may_apply_when: hungary-established-or-targeting-hungary
+      engineering_support: privacy.policy
+      note: project-default-jurisdiction-is-hungary
+    - name: ePrivacy / cookie consent
+      may_apply_when: storing-or-reading-non-essential-terminal-data
+      engineering_support: privacy.policy.consent
+    - name: CCPA / CPRA
+      may_apply_when: qualifying-california-business-thresholds-met
+      engineering_support: privacy.policy.user_rights
+  accessibility:
+    - name: WCAG 2.2 AA
+      status: framework-floor-regardless-of-jurisdiction
+      engineering_support: standards/accessibility.md
+    - name: European Accessibility Act
+      may_apply_when: in-scope-products-or-services-in-the-eu
+      engineering_support: standards/accessibility.md
+  security:
+    - name: OWASP ASVS
+      status: reference-standard-not-regulation
+      engineering_support: security.policy
+    - name: NIS2
+      may_apply_when: in-scope-essential-or-important-entity
+      engineering_support: security/incident-response.md
+
+# --- Hungarian defaults. Content owned by AS-011; presence enforced here.
+hungarian_documents:
+  required_when_operating_in_hungary:
+    - aszf                        # general terms and conditions
+    - adatkezelesi-tajekoztato    # privacy notice
+    - impresszum                  # imprint
+    - cookie-tajekoztato          # cookie notice
+  content_owner: content/legal-pages.md
+  mandatory_disclaimer: required
+  publication_without_legal_review: forbidden
+
+cookie_consent:
+  required_before_non_essential_storage: required
+  essential_cookies_exempt: true
+  granular_per_category: required
+  withdrawal_available: required
+  consent_log_retained: required
+  scanning_verifies_no_pre_consent_cookies: required   # chrome-devtools-mcp (TE-08)
+
+evidence:
+  # Compliance is demonstrated by artifacts the framework already produces.
+  security_review_record: quality/security-review.md
+  threat_model: security/threat-modeling.md
+  data_inventory: required
+  data_classification: security/data-classification.md
+  retention_schedule: privacy.policy.retention
+  access_control_record: authorization.policy
+  audit_log: security/audit-logging.md
+  incident_record: security/incident-response.md
+  dependency_scan_record: security.policy.dependencies
+  backup_restore_test_record: backup.policy
+  decision_log: memory/decisions.md
+
+audit_readiness:
+  evidence_current: required
+  evidence_reproducible: required
+  documentation_matches_reality: required   # drift is a finding
+  gaps_recorded_not_concealed: required
+
+documentation:
+  security_documentation_present: required
+  privacy_notice_present_ref: privacy.policy.transparency.privacy_notice_present   # canonical there
+  processor_inventory: required
+  data_transfer_record: required-when-transfers-occur
+
+review:
+  gate: security-review
+  legal_gate: qualified-legal-professional
+  framework_authority_ends_at: engineering-evidence
+
+legal_review:
+  mandatory_disclaimer: required
+  disclaimer: >
+    This policy is engineering guidance, not legal advice, and states no legal
+    conclusion. Whether any regime applies to a given project is a legal
+    determination. Every legal document, compliance claim, and regulatory
+    representation MUST be reviewed and approved by qualified legal professionals
+    before publication.

@@ -1,0 +1,63 @@
+# Release Policy
+# Framework: CEF · Specification: AS-013 (Quality Assurance Engine) · Version: 0.1.0
+# Canonical production-readiness criteria, release recommendation rules, and sign-off.
+# Single source of truth for standards/quality/production-readiness.md and
+# standards/quality/release-checklist.md. Documentation MUST match these values.
+
+policy: release
+version: 0.1.0
+
+# Production-readiness conditions (Gate 14). Any failure is Critical.
+production_readiness:
+  - no-placeholder-content
+  - no-todos
+  - no-console-logs
+  - no-debug-code
+  - no-dead-routes
+  - no-broken-images
+  - no-missing-metadata
+  - no-accessibility-failures
+  - no-failed-builds
+  - no-lint-failures
+  - docker-builds-successfully
+  - no-broken-links
+  - all-gates-passed
+  - definition-of-done-met
+rules_readiness:
+  verified_with_evidence: required
+  any_failure_blocks: required
+  tool_assisted_where_applicable: required
+
+# Release recommendation (computed at Gate 14).
+release_recommendation:
+  approve:
+    all_gates_passed: true
+    critical: 0
+    major: 0
+    overall_score_min: 90
+  approve_with_conditions:
+    critical: 0
+    major: 0
+    open_minors: recorded-waiver-with-remediation-plan
+    overall_score_min: 85
+  reject:
+    any_of:
+      - critical_present
+      - major_present
+      - overall_score_below: 85
+      - any_gate_not_passed
+
+rules_release:
+  no_release_on_reject: required
+  reviewed_work_only: required          # WF-11
+  tested_rollback_required: required
+  post_release_health_verified: required
+  completion_report_required: required  # Constitution Article X
+  record_release: [memory/deployment.md, CHANGELOG.md]
+  record_approval: memory/decisions.md
+  version_semver: required
+
+sign_off:
+  approver: product-strategist
+  gate: 14
+  authority: final-before-deployment

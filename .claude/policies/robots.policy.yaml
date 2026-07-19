@@ -1,0 +1,33 @@
+# Robots Policy
+# Framework: CEF · Specification: AS-010 (Discoverability Engine) · Version: 0.1.0
+# Canonical robots directives. Single source of truth for discoverability/robots.md.
+# Documentation MUST match these values.
+
+policy: robots
+version: 0.1.0
+
+robots_txt:
+  required: true
+  reference_sitemap: required
+  block_render_resources: forbidden      # do not block CSS/JS needed to render
+
+per_page:
+  index_state_explicit: required
+  production_indexable: required
+  staging_preview: noindex-or-auth
+  utility_pages_noindex:                 # intentionally kept out of the index
+    - thank-you
+    - internal-search-results
+    - duplicate-parameter-pages
+  conflicting_rules: forbidden           # noindex vs sitemap/canonical clash
+
+deindexing:
+  method: noindex                        # disallow alone does not deindex
+  disallow_only_to_deindex: forbidden
+
+crawl_paths:
+  infinite_or_parameter_paths: controlled  # canonical/robots/parameter handling
+
+ai_crawlers:
+  policy: optional                       # emerging convention; see llms.policy
+  guarantee: none

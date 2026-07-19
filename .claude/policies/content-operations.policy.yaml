@@ -1,0 +1,137 @@
+# Content Operations Policy
+# Framework: CEF · Specification: AS-018 (Content Operations Engine) · Version: 2.0.0
+# Canonical source of truth for the content model, storage, media operations,
+# versioning, search, migration, and the content-operations review gate.
+#
+# Boundaries. Content COPY (voice, tone, what it says) -> standards/content/ (AS-011).
+# Localization -> localization.policy.yaml. Publishing -> publishing.policy.yaml.
+# Editorial states -> editorial.policy.yaml. Taxonomy -> taxonomy.policy.yaml.
+# Asset folder structure and naming -> assets.policy.yaml (AS-012). Image formats and
+# budgets -> images.policy.yaml (AS-010). Authorization model -> authorization.policy.yaml
+# (AS-016). Backup mechanics -> backup.policy.yaml (AS-014). Component classification ->
+# components/taxonomy.md (AS-007). SEO -> discoverability.policy.yaml (AS-010).
+# Documentation MUST match these values.
+
+policy: content-operations
+version: 2.0.0
+
+# --- Content types. Every modeled type resolves to exactly one of these.
+content_types:
+  - page
+  - article
+  - product
+  - service
+  - case-study
+  - testimonial
+  - author
+  - category
+  - tag
+  - navigation
+  - faq
+  - team-member
+  - event
+  - download
+
+content_model:
+  type_explicit: required
+  fields_typed: required
+  fields_validated_at_boundary: required   # E-041
+  relationships_explicit: required
+  lifecycle_declared: required
+  required_fields_minimal: required
+  field_justified_individually: required
+  unstructured_blob_as_model: forbidden
+  presentation_in_content_model: forbidden # no HTML/CSS baked into content
+  model_versioned: required
+  breaking_model_change_is_a_migration: required
+
+structured_over_unstructured:
+  principle: structured-content-scales
+  discrete_fields_over_rich_text: required
+  rich_text_for_prose_only: required
+  layout_encoded_in_rich_text: forbidden
+  html_pasted_into_rich_text: forbidden
+  component_blocks_typed: required         # portable/structured blocks, not raw markup
+
+storage:
+  cms_agnostic: required                   # no vendor mandated
+  content_behind_typed_interface: required
+  vendor_types_in_domain: forbidden
+  content_portable: required               # exportable without the vendor
+  content_exportable_as_structured_data: required
+
+media:
+  organization_ref: assets.policy          # AS-012 owns folder structure and naming
+  format_and_budget_ref: images.policy     # AS-010 owns formats and size budgets
+  metadata_required: [alt_or_decorative, title, license, source]
+  alt_text_required: required              # D-092; decorative uses empty alt (D-093)
+  alt_text_deferred_to_publish: forbidden
+  license_recorded: required
+  license_unknown_blocks_publish: required
+  orphaned_media_detected: required
+  reuse_over_reupload: required
+  duplicate_upload_detected: required
+  responsive_variants_generated: required
+  original_retained: required
+  deletion_checks_references: required     # deleting referenced media breaks pages
+
+versioning:
+  history_retained: required
+  every_change_creates_a_revision: required
+  revision_identifier_stable: required
+  author_recorded: required
+  timestamp_recorded: required
+  change_summary_required: required
+  diff_available: required
+  rollback_supported: required
+  rollback_creates_new_revision_ref: publishing.policy.rollback.rollback_creates_new_revision   # canonical there
+  history_deletable_by_editors: forbidden
+  retention_min_revisions: 10
+  retention_min_days: 365
+  published_version_always_restorable: required
+
+search:
+  indexing_defined: required
+  index_updated_on_publish: required
+  index_updated_on_unpublish: required
+  unpublished_content_in_public_index: forbidden
+  faceted_search_fields_allowlisted: required
+  synonyms_maintained: required
+  relevance_rule_documented: required
+  empty_result_state: required             # D-083
+  index_rebuild_supported: required
+
+migration:
+  content_validated_before_import: required
+  url_preservation: required
+  redirects_for_changed_urls: required     # 301; never silent breakage
+  redirect_chains_bounded: required
+  media_migrated_with_references: required
+  migration_reversible: required
+  migration_dry_run: required
+  source_retained_until_verified: required
+  broken_reference_after_migration: forbidden
+
+backup:
+  mechanics_ref: backup.policy             # AS-014 owns schedule, retention, restore testing
+  security_ref: security.policy            # AS-016 owns encryption and isolation
+  content_and_media_backed_up_together: required
+  restore_tested: required
+  backup_excludes_media: forbidden         # content without its media is not restorable
+
+skills:
+  editorial_layout: frontend-design-skill      # TE-02
+  editorial_ux: ui-ux-pro-max                  # TE-05
+  content_hierarchy: taste-skill               # TE-01
+  metadata: seo-skill                          # TE-06
+  nextjs_metadata: nextjs-seo-skill            # TE-07
+  rendered_validation: chrome-devtools-mcp     # TE-08
+  editorial_imagery: higgsfield-mcp            # TE-09
+
+review:
+  gate: content-operations-review
+  areas: [content-model, editorial-workflow, version-history, localization, search-readiness, media-organization, permissions, publishing-process]
+  checklist: checklists/content-operations.md
+  anti_patterns: hard-fail
+  floors: [accessibility, security, legal]
+  waiver: recorded-scoped-user-decision-only

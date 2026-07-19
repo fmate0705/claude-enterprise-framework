@@ -1,0 +1,35 @@
+# llms.txt Policy
+# Framework: CEF · Specification: AS-010 (Discoverability Engine) · Version: 0.1.0
+# Canonical llms.txt format. Single source of truth for discoverability/llms.md.
+# This is an EMERGING convention, not a ratified standard; no guarantee is implied.
+# Documentation MUST match these values.
+
+policy: llms
+version: 0.1.0
+status: emerging-convention
+
+file:
+  path: /llms.txt
+  format: markdown
+  required: true                     # every project generates one
+  optional_expanded: /llms-full.txt
+
+structure:
+  h1_site_name: required             # "# <Site Name>"
+  summary: required                  # concise, accurate blockquote/paragraph
+  curated_link_sections: required    # "## <Section>" with described links
+  optional_section: allowed          # "## Optional"
+
+rules:
+  accurate_and_current: required
+  concise: required                  # do not dump the whole site
+  no_fabricated_entries: required
+  links_canonical_indexable: required   # consistent with sitemap/canonical
+
+relationship_to_robots:
+  purpose: content-curation-for-ai     # not access control
+  access_control: robots-txt-or-auth   # llms.txt never gates access
+  conflate_with_robots: forbidden
+
+reliance:
+  depend_on_for_correctness: forbidden  # durable standards carry the guarantees

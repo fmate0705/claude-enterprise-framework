@@ -1,0 +1,70 @@
+# Capability: Full-Stack Platform
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+
+capability: fullstack
+version: 1.0.0
+
+classification:
+  aliases: [full-stack platform, full stack application, web platform, web application]
+  signals:
+    goal: deliver-a-platform
+    audience: [public-visitor, authenticated-user]
+    surfaces: public-plus-application
+    data: transactional-with-database
+    auth: required
+    commerce: optional
+complexity_default: enterprise
+
+engines:
+  required:
+    - architecture
+    - platform
+    - components
+    - experience
+    - motion
+    - discoverability
+    - content
+    - assets
+    - quality
+    - operations
+  excluded: []                  # a platform spans every domain
+
+skills: [taste-skill, frontend-design-skill, emil-frontend-design-skill, emil-motion-skill, ui-ux-pro-max, seo-skill, nextjs-seo-skill]
+mcps: [chrome-devtools-mcp, higgsfield-mcp]
+
+legal_documents:
+  - privacy-policy
+  - terms-of-service
+  - cookie-policy
+  - imprint
+  - accessibility-statement
+  hungarian_when_applicable: [aszf, adatkezelesi-tajekoztato, impresszum, cookie-tajekoztato]
+
+assets:
+  - logo-system
+  - og-image
+  - favicon-set
+  optional: [hero-image, product-renders, illustrations, social-assets]
+
+workflow:
+  project_type: PT-I            # workflow-engine/project-types.md
+  states: all
+  emphasis: [S08, S09, S14]     # architecture, testing, security
+  deltas: [api-contract, data-schema-and-migrations, auth, integration-tests, data-integrity-checks]
+
+profiles:
+  # "Full Stack Application" is defined in folder-structure.md (folder deltas).
+  # project-types.md carries no matching entry; its nearest requirements parent is SaaS.
+  architecture: full-stack-application   # standards/architecture/folder-structure.md
+  density:                      # experience.policy.yaml — dual surface (keys per saas.yaml)
+    marketing: comfortable
+    app: dense
+  motion_level:                 # motion.policy.yaml
+    marketing: marketing        # default 3, ceiling 4
+    app: saas_app               # default 2, ceiling 2
+  page_sections: [landing, about, contact]   # content.policy.yaml (public surface)
+
+validation:
+  gates: all
+  emphasis: [architecture, security, testing, performance]
+  release_verification: all

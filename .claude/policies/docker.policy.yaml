@@ -1,0 +1,64 @@
+# Docker Policy
+# Framework: CEF · Specification: AS-014 (Delivery & Operations Engine) · Version: 0.1.0
+# Canonical container RUNTIME requirements. Single source of truth for
+# operations/docker.md and operations/docker-compose.md.
+# Image BUILD rules are documented in platform/docker.md (AS-006); this policy is the
+# machine-readable owner of the container values. Documentation MUST match these values.
+
+policy: docker
+version: 0.1.0
+
+required_artifacts:
+  - Dockerfile
+  - docker-compose.yml
+  - .dockerignore
+  - healthcheck
+
+runtime:
+  port_default: 3000                  # overridable via environment
+  user: non-root                      # where practical
+  multi_stage_build: required
+  minimal_pinned_base: required
+  latest_tag: forbidden
+  config_baked_into_image: forbidden  # inject at runtime
+  secrets_in_image: forbidden
+  immutable_images: required          # never patch a running container
+  reproducible_build: required        # clean checkout + frozen lockfile
+  logs_to_stdout_stderr: required
+
+naming:
+  container: "<project>-<service>"
+  network: "<project>-network"
+
+restart_policy:
+  required: true
+  long_running_default: unless-stopped
+
+resource_limits:
+  cpu: required
+  memory: required
+  unbounded_containers: forbidden
+
+volumes:
+  persistent_data: named-volumes
+  durable_state_on_container_fs: forbidden
+  bind_mounts: development-source-only
+
+networking:
+  services_communicate_over: named-network
+  publish_internal_ports: forbidden
+  public_entry: reverse-proxy-only
+
+compose:
+  one_command_up: required
+  secrets_from_env_files_or_store: required
+  hardcoded_secrets: forbidden
+  healthcheck_gated_dependencies: required
+  pinned_dependency_images: required
+  env_example_documented: required
+  production_limits: required
+  overrides_for_dev: recommended
+
+references:
+  image_build_rules: platform/docker.md
+  health_endpoints: operations.policy.yaml

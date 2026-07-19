@@ -1,0 +1,75 @@
+# Automation Policy
+# Framework: CEF · Specification: AS-020 (Validation & Automation Engine) · Version: 2.0.0
+# CI/CD pipelines, schedules, and time budgets. CI-provider-agnostic (VLP-39): pipelines are
+# described by trigger, stages, and budget, not by a specific vendor's syntax.
+#
+# SCOPE. Deployment mechanics (promotion order, rollback, health) are owned by M-DEPLOY
+# (deployment.policy). Skill routing is owned by qa.policy.tool_assisted_validation (AS-013),
+# executed via runtime/skill-manager.md (AS-015). Documentation MUST match these values.
+
+policy: automation
+version: 2.0.0
+review_ref: validation.policy.yaml
+
+# --- Pipeline principles (AUT).
+principles:
+  event_triggered_not_manual: required   # AUT-01
+  version_controlled: required           # AUT-02
+  deterministic: required                # AUT-03
+  secrets_from_store_never_logged: required   # AUT-04
+  fail_closed: required                  # AUT-05
+  cheapest_stages_first: required        # AUT-13
+  every_signal_enforced_or_removed: required   # AUT-16
+  ci_provider_is_an_implementation_detail: required   # AUT-19
+
+# --- The pipelines (AUT-06…AUT-12). Stage lists reference the validation order.
+pipelines:
+  pull_request:
+    trigger: pull-request               # AUT-06
+    stages: [build, unit, integration, e2e_critical, accessibility_fast, bundle_budget, seo]
+    time_budget_minutes: 15             # TSG-08 — split/parallelize before exceeding
+    blocks_merge: required              # CVN-03
+  nightly:
+    trigger: schedule
+    schedule: nightly                   # AUT-07
+    stages: [e2e_full, cross_browser, cross_platform, visual_regression, lighthouse_full, dependency_audit, benchmark]
+  release_candidate:
+    trigger: release-candidate          # AUT-08
+    stages: [release_validation]        # runs the full suite -> RLV-03
+    produces: release-evidence-artifact # RLV-07
+  production_release:
+    trigger: promotion                  # AUT-09
+    stages: [reproducible_build_verify, smoke_deployed_target, health_check, rollback_verify]
+    defers_to: deployment.policy.yaml   # AUT-20 — mechanics owned by M-DEPLOY
+  dependency_update:
+    trigger: schedule
+    schedule: weekly                    # AUT-10
+    stages: [full_suite, vulnerability_scan]
+    auto_merge_on_failure: forbidden    # SCT-08 / VAP-106
+  benchmarking:
+    trigger: [schedule, release-candidate]   # AUT-11
+    schedule: nightly
+    stages: [performance_benchmark, quality_benchmark]
+    defers_to: benchmark.policy.yaml
+  documentation_verification:
+    trigger: pull-request               # AUT-12
+    stages: [docs_present_for_change, changelog_updated]
+
+# --- Schedules (owned here; XVV-08).
+schedules:
+  nightly: "0 2 * * *"                  # 02:00 daily (cron form; provider-agnostic intent)
+  weekly_dependency: "0 3 * * 1"        # 03:00 Monday
+  recorded_and_deterministic: required  # CVN-12
+
+# --- Budgets and flakiness.
+budgets:
+  pull_request_minutes: 15              # CVN-02
+  parallelize_before_slowing: required  # AUT-15
+flakiness:
+  quarantine_lane_required: required    # AUT-14
+  blanket_auto_retry: forbidden         # VAP-012
+  owner_and_deadline_required: required # VLP-20
+
+# --- Skill routing is NOT defined here (AUT-18 / VAP-119).
+skill_routing_ref: qa.policy.yaml       # tool_assisted_validation — AS-013
+skill_execution_ref: runtime/skill-manager.md   # AS-015 — order and TE-08

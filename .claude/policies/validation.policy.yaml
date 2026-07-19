@@ -1,0 +1,147 @@
+# Validation Policy
+# Framework: CEF · Specification: AS-020 (Validation & Automation Engine) · Version: 2.0.0
+# Master policy for automated verification: validation order, the device/browser/platform
+# matrices, which checks are automated per domain, reporting, and the review gate.
+#
+# SCOPE. This engine AUTOMATES the verification of standards owned elsewhere. It MUST NOT
+# restate a threshold, budget, gate, or requirement another engine owns; it references it
+# under `references`. The quality gates, review scoring, release DECISION, and validation
+# skill routing are owned by AS-013 (qa/quality-gates/review/release policies). Test DESIGN
+# is owned by M-TEST. Documentation MUST match these values.
+
+policy: validation
+version: 2.0.0
+
+# --- Canonical owners this engine measures against but never restates (OVR-01, XVV-10).
+references:
+  test_design: standards/testing.md                     # M-TEST — E-099…E-104
+  quality_gates: quality-gates.policy.yaml               # AS-013 — the 14 gates
+  review_scoring: review.policy.yaml                     # AS-013 — severity and score
+  release_decision: release.policy.yaml                  # AS-013 — approve/reject/sign-off
+  review_sequence: rules/review-engine.md                # RV-01…RV-13
+  skill_routing: qa.policy.yaml                          # AS-013 — tool_assisted_validation
+  skill_execution: runtime/skill-manager.md              # AS-015 — TE-08 order
+  cwv_thresholds: discoverability.policy.yaml            # M-SEO/M-PERF — LCP/CLS/INP
+  bundle_budget: standards/platform/performance.md       # project bundle budget
+  image_budgets: images.policy.yaml                      # M-IMG
+  wcag_level: standards/accessibility.md                 # M-A11Y — WCAG 2.2 AA (floor)
+  seo_requirements: rules/seo-engine.md                  # M-SEO — SE-01…SE-13
+  ai_seo_requirements: standards/ai-seo.md               # M-AISEO
+  schema_requirements: schema.policy.yaml                # required structured-data types
+  security_model: standards/security/                    # M-SEC (floor)
+  docker_standard: docker.policy.yaml                    # M-DOCKER/M-DEPLOY
+  deployment: deployment.policy.yaml                     # M-DEPLOY — promotion, rollback
+  monitoring: monitoring.policy.yaml                     # M-DEPLOY — drift, health
+  localization_formats: localization.policy.yaml         # M-CONTENTOPS/AS-011
+
+# --- Validation order (fixed). Cheapest first; floors never bypassed (XVV-05).
+order:
+  - build            # static analysis: types, lint, format, build (BLD)
+  - unit
+  - integration
+  - e2e_critical
+  - schema
+  - accessibility
+  - performance
+  - lighthouse
+  - seo
+  - ai_discoverability
+  - security
+  - visual_regression
+  - responsive
+  - cross_browser
+  - cross_platform
+  - docker
+  - release_validation
+rules_order:
+  cheapest_first: required            # AUT-13
+  fail_fast_allowed: true             # AUT-13 — may short-circuit on required failure
+  floor_bypass: forbidden             # OVR-03
+  reorder_without_reason: forbidden
+
+# --- Device/browser/platform matrices (owned here; XVV-08).
+viewports:            # breakpoint values owned by layout.policy; these are the test classes
+  - mobile
+  - tablet
+  - laptop
+  - desktop
+  - ultra-wide
+  orientation: [portrait, landscape]
+browsers:
+  engines: [chromium, gecko, webkit]
+  mobile: [mobile-chromium, mobile-webkit]
+  strategy: feature-detection            # XBR-07 — never user-agent sniffing
+  declared_support_required: true        # XBR-02
+platforms:
+  os: [windows, macos, linux, ios, android]
+  server_runtime: container              # XPL-03 — validated in the production container
+  declared_support_required: true
+
+# --- Which checks are automated per domain (the WHAT-IS-VERIFIED; thresholds are the owner's).
+accessibility:                            # WCAG level -> references.wcag_level (M-A11Y, floor)
+  automated_scan_every_page: required     # ACT-01
+  headings_verified: required             # ACT-02
+  aria_verified: required                 # ACT-03
+  names_and_labels_verified: required     # ACT-04
+  alt_text_verified: required             # ACT-05
+  contrast_measured: required             # ACT-06 (threshold = M-A11Y)
+  focus_verified: required                # ACT-07
+  keyboard_operation_verified: required   # ACT-09 (human)
+  screen_reader_verified: required        # ACT-10 (human, critical flows)
+  reduced_motion_verified: required       # ACT-11
+  scan_reported_as_proof: forbidden       # ACT-08 — a floor, not proof
+seo:                                      # requirements -> references.seo_requirements (M-SEO)
+  metadata_verified_every_page: required  # SEV-01
+  canonical_verified: required            # SEV-02
+  robots_state_verified: required         # SEV-03
+  social_tags_verified: required          # SEV-04
+  sitemap_verified: required              # SEV-08
+  internal_links_verified: required       # SEV-06
+  cross_surface_consistency_verified: required  # SEV-14
+ai_discoverability:                       # requirements -> references.ai_seo_requirements
+  llms_txt_verified: required             # ADV-01
+  robots_alignment_verified: required     # ADV-03
+  entities_verified_consistent: required  # ADV-05
+  content_hierarchy_extractable: required # ADV-07
+  claim_matches_content: required         # ADV-10
+schema:                                   # required types -> references.schema_requirements
+  jsonld_valid: required                  # SCV-01
+  required_properties_present: required   # SCV-02
+  values_match_content: required          # SCV-03
+  contract_conformance_verified: required # SCV-06
+docker:                                   # standard -> references.docker_standard
+  build_from_clean_checkout: required     # DKT-01
+  production_image_validated: required    # DKT-03
+  env_vars_validated: required            # DKT-06
+  health_endpoints_validated: required    # DKT-07
+  no_secrets_in_image: required           # DKT-09 (floor via M-SEC)
+security:                                 # model -> references.security_model (M-SEC, floor)
+  dependency_scan: required               # SCT-01
+  static_analysis: required               # SCT-02
+  secret_scan: required                   # SCT-03
+  headers_verified: required              # SCT-04
+  authz_negative_tested: required         # SCT-06
+  scan_reported_as_proof: forbidden       # SCT-12 — a floor, not proof
+  finding_severity_owner: security.policy # SCT-10 — M-SEC owns severity
+
+# --- Reporting (RPT).
+reporting:
+  durable_artifact_required: required     # RPT-01
+  machine_and_human_readable: required    # RPT-09
+  states: [pass, fail, skipped, quarantined, not-collected]   # RPT-08
+  skip_reported_as_pass: forbidden        # RPT-08
+  failure_actionable: required            # RPT-04
+  failure_reproducible: required          # RPT-05
+  overstating_scope: forbidden            # RPT-10
+  domain_reports: [coverage, performance, accessibility, seo, security, regression, release]
+
+# --- The validation review gate (content in review.md; execution/scoring = AS-013).
+review:
+  gate: validation-review
+  areas: [coverage, reliability, accessibility, performance, security, seo, ai-discoverability, documentation, automation, release-readiness]
+  anti_patterns: hard-fail               # any VAP entry fails the gate
+  floors: [accessibility, security, performance, legal]   # never waived (OVR-03)
+  decision_owner: release.policy.yaml     # RLV-09 — AS-013 decides
+  severity_owner: review.policy.yaml      # RV-13 / AS-013
+  waiver: recorded-scoped-user-decision-only
+  certify_beyond_scope: forbidden         # VRV-12

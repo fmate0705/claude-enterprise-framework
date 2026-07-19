@@ -1,0 +1,73 @@
+# Capability: E-Commerce / Marketplace
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+
+capability: ecommerce
+version: 1.0.0
+
+classification:
+  aliases: [ecommerce, e-commerce, online store, shop, webshop, marketplace]
+  signals:
+    goal: sell
+    audience: public-visitor
+    surfaces: many-pages-plus-checkout
+    data: transactional
+    auth: optional-to-required
+    commerce: catalog-cart-payments
+complexity_default: complex
+
+engines:
+  required:
+    - architecture
+    - platform
+    - components
+    - experience
+    - motion
+    - discoverability
+    - content
+    - assets
+    - quality
+    - operations
+  excluded: []
+
+skills: [taste-skill, frontend-design-skill, emil-frontend-design-skill, ui-ux-pro-max, seo-skill, nextjs-seo-skill]
+mcps: [chrome-devtools-mcp, higgsfield-mcp]
+
+legal_documents:                # commerce carries the heaviest legal surface
+  - privacy-policy
+  - terms-of-service
+  - cookie-policy
+  - imprint
+  - returns-and-shipping
+  - accessibility-statement
+  hungarian_when_applicable: [aszf, adatkezelesi-tajekoztato, impresszum, cookie-tajekoztato]
+
+assets:
+  - logo-system
+  - og-image
+  - favicon-set
+  - product-imagery
+  optional: [hero-image, lifestyle-imagery, social-assets]
+
+workflow:
+  project_type: PT-G            # workflow-engine/project-types.md
+  states: all
+  emphasis: [S12, S13, S14]     # product schema, image performance, payment security
+  deltas: [catalog-content-model, cart-and-checkout-flows, payment-gateway-isolation, product-jsonld]
+
+profiles:
+  architecture: e-commerce      # standards/architecture/project-types.md
+  density: comfortable          # experience.policy.yaml
+  motion_level: marketing       # motion.policy.yaml
+  page_sections: [landing, pricing, faq, contact]   # content.policy.yaml (product pages per content/products.md)
+
+# Applied when classified as marketplace (runtime.policy delta).
+deltas:
+  marketplace:
+    adds: [vendor-accounts, vendor-onboarding, payouts, trust-and-safety, multi-vendor-catalog]
+    complexity: enterprise
+    emphasis: [security, legal, architecture]
+
+validation:
+  gates: all
+  emphasis: [security, performance, discoverability, legal]
+  release_verification: all

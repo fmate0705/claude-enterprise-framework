@@ -1,0 +1,64 @@
+# Capability: Agency Website
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+
+capability: agency-site
+version: 1.0.0
+
+classification:
+  aliases: [agency website, studio site, consultancy site]
+  signals:
+    goal: demonstrate-capability-and-win-inquiries
+    audience: public-visitor
+    surfaces: many-pages
+    data: content-only-or-cms
+    auth: none
+    commerce: none
+complexity_default: standard
+
+engines:
+  required:
+    - architecture
+    - platform
+    - components
+    - experience
+    - motion
+    - discoverability
+    - content
+    - assets
+    - quality
+    - operations
+  excluded: []
+
+skills: [taste-skill, frontend-design-skill, emil-frontend-design-skill, emil-motion-skill, ui-ux-pro-max, seo-skill, nextjs-seo-skill]
+mcps: [chrome-devtools-mcp, higgsfield-mcp]
+
+legal_documents:
+  - privacy-policy
+  - terms-of-service
+  - cookie-policy
+  - imprint
+  hungarian_when_applicable: [aszf, adatkezelesi-tajekoztato, impresszum, cookie-tajekoztato]
+
+assets:                         # work showcase is asset-heavy
+  - logo-system
+  - og-image
+  - favicon-set
+  - case-study-imagery
+  optional: [hero-image, team-photography, illustrations, social-assets]
+
+workflow:
+  project_type: PT-D            # workflow-engine/project-types.md
+  states: all
+  emphasis: [S05, S06, S12]     # brand, lead flows, SEO
+  deltas: [lead-capture-flow, case-study-content-model, blog-subsystem, cms-layer]
+
+profiles:
+  architecture: agency          # standards/architecture/project-types.md
+  density: comfortable          # experience.policy.yaml
+  motion_level: marketing       # motion.policy.yaml
+  page_sections: agency_home    # content.policy.yaml
+
+validation:
+  gates: all
+  emphasis: [experience, assets, content, discoverability]
+  release_verification: all

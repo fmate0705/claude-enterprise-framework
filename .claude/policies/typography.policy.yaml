@@ -1,0 +1,47 @@
+# Typography Policy
+# Framework: CEF · Specification: AS-008 (Experience Engine) · Version: 0.1.0
+# Canonical typography values. Single source of truth for experience/typography.md.
+# Documentation MUST match these values.
+
+policy: typography
+version: 0.1.0
+
+base_body_px: 16              # minimum body size on every viewport
+max_font_families: 2
+
+scale_px:
+  body-sm: 14
+  body: 16
+  body-lg: 18
+  h6: 18
+  h5: 20
+  h4: 24
+  h3: 30
+  h2: 36
+  h1: 48
+  display: 60
+
+line_height:
+  body: 1.5
+  relaxed: 1.6
+  heading_max: 1.25
+  display: 1.1
+
+measure_ch:
+  min: 45
+  max: 75
+  ideal: 66
+
+max_prose_width_ch: 65        # ~720px; see layout.policy max_prose_width_px
+
+letter_spacing_em:
+  display: -0.02
+  body: 0
+  caps: 0.05
+
+rules:
+  scale_only: required
+  descend_headings_in_order: required
+  all_caps_long_text: forbidden
+  type_as_decoration: forbidden
+  tabular_numerals_for_data: required

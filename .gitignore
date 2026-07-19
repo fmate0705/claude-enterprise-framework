@@ -1,0 +1,67 @@
+# ---------------------------------------------------------------------------
+# Claude Enterprise Framework — .gitignore
+# ---------------------------------------------------------------------------
+# The framework itself is documentation-first. These ignores exist so that
+# reference builds under examples/ and any local tooling do not leak build
+# artifacts, secrets, or OS cruft into the framework repository.
+# ---------------------------------------------------------------------------
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+.yarn/
+jspm_packages/
+
+# Build output
+dist/
+build/
+out/
+.next/
+.turbo/
+.vercel/
+.output/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Caches & coverage
+.cache/
+.eslintcache
+.parcel-cache/
+coverage/
+.nyc_output/
+
+# Testing
+playwright-report/
+test-results/
+
+# Editor & IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude Code local state (framework docs are tracked; local runtime state is not)
+.claude/memory/*.local.md
+.claude/**/*.tmp

@@ -1,0 +1,109 @@
+# Editorial Policy
+# Framework: CEF · Specification: AS-018 (Content Operations Engine) · Version: 2.0.0
+# Canonical source of truth for the editorial workflow: states, transitions, approvals,
+# roles, and permissions.
+#
+# Boundaries. The authorization MODEL (default deny, enforcement, object-level checks)
+# is owned by authorization.policy.yaml (AS-016); this file defines editorial ROLES that
+# model expresses. Content quality review is owned by content/review.md (AS-011).
+# Publishing mechanics -> publishing.policy.yaml.
+# Documentation MUST match these values.
+
+policy: editorial
+version: 2.0.0
+
+# --- The workflow. Ordered; no state skipped.
+states: [idea, draft, internal-review, revision, approval, scheduled, published, archived]
+
+terminal_states: [archived]
+
+transitions:
+  idea:            [draft]
+  draft:           [internal-review, archived]
+  internal-review: [revision, approval, draft]
+  revision:        [internal-review, draft, archived]
+  approval:        [scheduled, published, revision]
+  scheduled:       [published, approval, draft]
+  published:       [archived, draft]        # draft = new working revision, live stays live
+  archived:        [draft]                  # revive as a new draft
+
+transition_rules:
+  undeclared_transition: forbidden
+  skipping_review: forbidden
+  self_approval: forbidden                  # the author is not the approver
+  every_transition_logged: required
+  every_transition_attributed: required
+  transition_reason_required_on_rejection: required
+  state_authoritative_server_side: required
+  client_asserted_state: forbidden
+
+approvals:
+  required_before_publish: required
+  approver_distinct_from_author: required
+  approver_role_explicit: required
+  approval_recorded_with_version: required  # approval binds to a revision, not to a title
+  approval_invalidated_by_edit: required    # editing after approval requires re-approval
+  approval_expiry_days: 30
+  verbal_or_untracked_approval: forbidden
+  bypass_without_recorded_decision: forbidden
+
+review_stage:
+  reviewer_distinct_from_author: required
+  review_criteria_documented: required
+  rejection_states_reason: required
+  rejection_returns_to_revision: required
+  review_covers: [accuracy, brand-voice, structure, links, media, metadata, accessibility, legal]
+  legal_content_requires_legal_review: required   # AS-016 LEG-14
+  unreviewed_publish: forbidden
+
+drafts:
+  autosave: required
+  draft_never_public: required
+  draft_indexable: forbidden
+  draft_preview_authorized: required        # unguessable is not authorized (AZ-15)
+  concurrent_edit_guarded: required         # lock or merge, never silent overwrite
+  silent_overwrite: forbidden
+  draft_of_published_does_not_affect_live: required
+  abandoned_draft_retention_days: 180
+
+# --- Roles. Least privilege; the authorization model is AS-016's.
+roles:
+  author:
+    can: [create-draft, edit-own-draft, submit-for-review, view-own-history]
+    cannot: [approve, publish, delete-history, edit-others-drafts]
+  editor:
+    can: [edit-any-draft, review, request-revision, manage-taxonomy, manage-media]
+    cannot: [approve-own-work, publish-without-approval, delete-history]
+  reviewer:
+    can: [review, comment, request-revision, approve]
+    cannot: [publish, edit-content-directly]
+  publisher:
+    can: [publish, schedule, unpublish, rollback]
+    cannot: [approve-own-work, delete-history]
+  administrator:
+    can: [manage-roles, manage-model, manage-integrations, migrate]
+    cannot: [delete-audit-history]
+  read-only:
+    can: [view-published, view-permitted-drafts]
+    cannot: [edit, publish, approve]
+
+permissions:
+  default_deny_ref: authorization.policy.principles.default_deny
+  least_privilege_ref: authorization.policy.principles.least_privilege
+  enforced_server_side: required           # AZ-05
+  object_level_checks: required            # AZ-12
+  role_assignment_audited: required
+  implicit_superuser: forbidden
+  publish_right_separate_from_edit_right: required
+  administrator_mfa: required              # MFA-02
+  role_change_reauthenticated: required    # AUTH-11
+
+audit:
+  who_what_when_outcome: required          # AL-12
+  append_only: required                    # AL-08
+  editors_cannot_alter_audit: required
+  retention_ref: content-operations.policy.versioning.retention_min_days
+
+review:
+  gate: content-operations-review
+  anti_patterns: hard-fail

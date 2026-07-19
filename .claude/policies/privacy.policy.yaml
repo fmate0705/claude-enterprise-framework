@@ -1,0 +1,109 @@
+# Privacy Policy (engineering)
+# Framework: CEF · Specification: AS-016 (Security & Compliance Engine) · Version: 2.0.0
+# Canonical source of truth for privacy-by-design engineering: minimization, purpose,
+# retention, deletion, consent, transparency, and user rights.
+#
+# This file governs ENGINEERING behavior. It states no legal conclusion. Legal
+# obligations vary by jurisdiction and MUST be reviewed by qualified legal
+# professionals before publication. Legal document CONTENT is owned by
+# content/legal-pages.md (AS-011); regulatory mapping is in compliance.policy.yaml.
+# Consumed by: standards/security/{privacy,data-classification}.md, checklists/security.md.
+# Documentation MUST match these values.
+
+policy: privacy
+version: 2.0.0
+
+principles:
+  privacy_by_design: required
+  privacy_by_default: required
+  data_minimization: required
+  purpose_limitation: required
+  storage_limitation: required
+  accuracy: required
+  integrity_and_confidentiality: required
+  accountability: required
+  transparency: required
+
+collection:
+  collect_only_what_a_stated_purpose_requires: required
+  purpose_recorded_before_collection: required
+  speculative_collection_for_future_use: forbidden
+  sensitive_data_collection: avoid-unless-required-and-recorded
+  field_justified_individually: required
+  default_optional: required            # required fields are the exception
+
+processing:
+  processing_limited_to_stated_purpose: required
+  repurposing_without_new_basis: forbidden
+  personal_data_in_logs: minimize
+  personal_data_in_analytics: minimize
+  personal_data_in_error_reports: scrub
+  personal_data_in_urls_or_query_strings: forbidden
+  personal_data_to_third_parties: recorded-decision-only
+  pseudonymize_where_possible: required
+  anonymize_for_analytics: preferred
+
+retention:
+  retention_period_defined_per_data_class: required
+  indefinite_retention: forbidden
+  retention_enforced_automatically: required
+  expired_data_purged: required
+  backups_covered_by_retention: required   # backup.policy owns mechanics
+
+deletion:
+  user_initiated_deletion_supported: required
+  deletion_propagates_to_backups_and_replicas: required
+  soft_delete_presented_as_deletion: forbidden
+  deletion_confirmed_to_user: required
+  deletion_audited: required
+
+consent:
+  freely_given_specific_informed_unambiguous: required
+  pre_ticked_boxes: forbidden
+  implied_consent_for_non_essential: forbidden
+  granular_per_purpose: required
+  withdrawal_as_easy_as_giving: required
+  consent_recorded_with_timestamp_and_scope: required
+  non_essential_cookies_before_consent: forbidden
+  cookie_walls: discouraged
+  dark_patterns_in_consent_ui: forbidden
+  reject_all_as_prominent_as_accept_all: required
+
+user_rights:
+  # Availability and scope are jurisdiction-dependent; engineering supports them.
+  access: supported
+  rectification: supported
+  erasure: supported
+  portability: supported                # machine-readable export
+  restriction: supported
+  objection: supported
+  identity_verified_before_fulfilment: required
+  fulfilment_path_documented: required
+
+transparency:
+  privacy_notice_present: required
+  notice_in_plain_language: required
+  notice_matches_actual_processing: required   # drift is a defect
+  third_party_processors_disclosed: required
+  data_transfers_disclosed: required
+
+security_of_personal_data:
+  # Encryption and access requirements are canonical in security.policy; personal data
+  # inherits them. Restating them here would permit the two to drift.
+  encryption_ref: security.policy.secrets            # encryption_in_transit / encryption_at_rest
+  access_least_privilege_ref: authorization.policy.principles.least_privilege
+  access_to_personal_data_audited: required
+
+breach:
+  detection_and_escalation_path_defined: required
+  # Notification duties are legal determinations; see compliance.policy and
+  # security/incident-response.md. This file states no notification deadline.
+  assessment_documented: required
+
+legal_review:
+  mandatory_disclaimer: required
+  disclaimer: >
+    This policy governs engineering behavior only. It is not legal advice and states
+    no legal conclusion. Privacy obligations vary by jurisdiction. Every published
+    privacy notice and every compliance claim MUST be reviewed by qualified legal
+    professionals before publication.

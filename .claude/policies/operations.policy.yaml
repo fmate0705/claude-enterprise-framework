@@ -1,0 +1,83 @@
+# Operations Policy
+# Framework: CEF · Specification: AS-014 (Delivery & Operations Engine) · Version: 0.1.0
+# Canonical environment hierarchy, health endpoints, incident severity, maintenance
+# cadence, skill routing, and review gates. Single source of truth for
+# operations/{environments,health-checks,incident-response,maintenance,review}.md.
+# Documentation MUST match these values.
+
+policy: operations
+version: 0.1.0
+provider_neutral: required          # no hosting provider is mandated
+
+environment_hierarchy: [development, testing, staging, production]
+environments:
+  development:
+    secrets: local-dev-only
+    approval: none
+    debug_allowed: true
+  testing:
+    secrets: ci-scoped-test-only
+    approval: none
+    ephemeral: true
+  staging:
+    secrets: staging-only
+    approval: automated-gates
+    mirrors_production: required
+    indexable: false
+  production:
+    secrets: production-secret-store
+    approval: explicit-human            # see deployment.policy promotion
+    debug_allowed: false
+rules_environments:
+  one_direction: required
+  production_secrets_downstream: forbidden
+  production_data_downstream: forbidden
+  reproducible_from_code: required
+  record_in_memory: memory/deployment.md
+
+health_endpoints:
+  liveness: /health/live               # cheap, dependency-free
+  readiness: /health/ready             # checks required dependencies
+  health: /health                      # aggregate detail (protected)
+health_rules:
+  healthy_status_code: 200
+  unhealthy_status_code: 503
+  body_fields: [status, version, checks]
+  status_values: [ok, degraded, fail]
+  bounded_timeouts: required
+  expose_version: required
+  monitored_externally: required
+
+incident_severity:
+  SEV1: complete-outage-data-loss-or-active-breach
+  SEV2: major-functionality-broken-or-severe-degradation
+  SEV3: limited-impact-workaround-exists
+  SEV4: minor-no-material-impact
+incident_rules:
+  declare_early: required
+  single_owner: required
+  mitigate_before_diagnose: required
+  postmortem_required_for: [SEV1, SEV2]
+  blameless: required
+  preventive_actions_owned_and_tracked: required
+
+maintenance_cadence:
+  security_patches: prompt-on-disclosure
+  dependency_review: monthly
+  restore_test: monthly                # canonical in backup.policy
+  certificate_alert_days: 14           # canonical in security.policy
+  dr_plan_review: on-material-change
+
+skill_routing:
+  validate_browser_deployment: chrome-devtools-mcp        # TE-08
+  validate_generated_assets: higgsfield-mcp               # TE-09
+  validate_frontend_post_deploy: [frontend-design-skill, ui-ux-pro-max]  # TE-02, TE-05
+  devtools_verifies: [performance, console, network, rendering, accessibility]
+  fallback: tool-engine-TE-12
+
+# Operations review contributes to QA gates; it is not a parallel authority.
+review:
+  contributes_to_gates: [11, 14]       # quality-gates.policy.yaml
+  release_decision_owner: release.policy.yaml
+  severity_and_scoring: review.policy.yaml
+  checklists: [monitoring, backup, recovery, maintenance, deployment, release, security]

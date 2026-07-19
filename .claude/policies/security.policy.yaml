@@ -1,0 +1,160 @@
+# Security Policy
+# Framework: CEF · Specification: AS-016 (Security & Compliance Engine) · Version: 2.0.0
+# Canonical source of truth for security architecture: trust boundaries, transport,
+# secrets, input handling, uploads, rate limiting, dependencies, container hardening,
+# and the security review gate.
+#
+# Supersedes the AS-014 "Operational Security Policy" (v0.1.0), whose values were
+# redistributed without loss:
+#   http_security_headers, header_rules, csp -> headers.policy.yaml
+#   cookies, sessions                        -> authentication.policy.yaml
+#   exposure.least_privilege                 -> authorization.policy.yaml
+#   tls, secrets, scanning, rate_limiting, exposure -> this file
+# Consumed by: standards/security/*, standards/operations/{security-headers,ssl}.md,
+# quality/security-review.md, checklists/security.md.
+# Documentation MUST match these values.
+
+policy: security
+version: 2.0.0
+supersedes: operational-security@0.1.0
+
+# --- Floors. Never lowered except by a recorded, scoped user waiver. Never below law.
+floors:
+  security: non-negotiable
+  defensible_against_hostile_input: required
+  waiver: recorded-scoped-user-decision-only
+
+posture:
+  secure_by_default: required
+  default_deny_ref: authorization.policy.principles.default_deny   # canonical there
+  fail_securely: required          # a failure denies, never grants
+  defense_in_depth: required
+  least_privilege_ref: authorization.policy.principles.least_privilege   # canonical there
+  minimal_attack_surface: required
+  zero_trust_of_client: required
+
+trust_boundaries:
+  documented: required
+  validation_at_every_boundary: required
+  client_is_untrusted: always
+  network_is_untrusted: always
+
+# --- Transport. Absorbed from AS-014 operational-security@0.1.0.
+transport:
+  https_everywhere: required
+  http_to_https_redirect: required
+  min_version: "1.2"
+  preferred_version: "1.3"
+  legacy_protocols: forbidden           # SSLv3, TLS 1.0/1.1
+  weak_ciphers: forbidden
+  valid_full_chain: required
+  automated_renewal: required
+  certificate_expiry_alert_days: 14     # canonical; monitoring.policy + operations.policy reference this
+  hsts: required-once-https-stable
+  mixed_content: forbidden
+
+# --- Secrets. Absorbed from AS-014 operational-security@0.1.0.
+secrets:
+  source: secret-store-or-ci-secrets
+  committed: forbidden
+  baked_into_image: forbidden
+  in_client_bundle: forbidden
+  in_logs: forbidden
+  in_error_messages: forbidden
+  in_urls_or_query_strings: forbidden
+  rotatable_without_code_change: required
+  rotate_on_suspected_leak: required
+  purge_from_history_on_leak: required
+  rotation_max_days: 365
+  distinct_per_environment: required
+  encryption_at_rest: required
+  encryption_in_transit: required
+
+input_validation:
+  server_side: required
+  client_side: ux-affordance-only        # never a control
+  schema_validated_at_boundary: required
+  allowlist_over_blocklist: required
+  type_checked: required
+  length_bounded: required
+  range_bounded: required
+  reject_over_sanitize: preferred
+  typed_after_parse: required
+
+output_encoding:
+  context_appropriate_encoding: required
+  raw_html_from_user_input: forbidden
+  template_autoescaping: required-on
+
+file_uploads:
+  authenticated: required
+  size_bounded: required
+  content_type_verified_by_content: required   # never by extension or client header
+  extension_allowlist: required
+  stored_outside_webroot: required
+  executable_permissions: forbidden
+  randomized_stored_filename: required
+  malware_scan: required-when-user-facing
+  served_from_distinct_origin: preferred
+
+rate_limiting:
+  public_endpoints: required
+  auth_endpoints: required
+  password_reset_endpoints: required
+  expensive_operations: required
+  per_identity_and_per_ip: required
+  unbounded_request_rate: forbidden
+
+dependencies:
+  scan_in_ci: required
+  container_scan_before_promotion: required
+  findings_of_consequence_block: required
+  pinned_and_locked: required
+  lockfile_committed: required
+  unused_packages: remove
+  unmaintained_packages: replace
+  license_reviewed: required
+  install_scripts_from_untrusted_sources: forbidden
+
+supply_chain:
+  provenance_preferred: required
+  registry_pinned_by_digest: preferred
+  build_reproducible: required
+  ci_secrets_scoped_least_privilege: required
+
+container:
+  minimal_base_image: required
+  non_root_user: required
+  image_scanned: required
+  read_only_root_filesystem: preferred
+  drop_all_capabilities_then_add_back: required
+  privileged_mode: forbidden
+  docker_socket_mount: forbidden
+  network_isolation: required
+  health_check: required
+  # Build-time image rules are owned by platform/docker.md (AS-006).
+
+exposure:
+  internal_endpoints_public: forbidden  # metrics/admin/debug
+  debug_endpoints_in_production: forbidden
+  stack_traces_to_client: forbidden
+  verbose_errors_to_client: forbidden
+  directory_listing: forbidden
+  trust_forwarded_headers_only_from_proxy: required
+  version_disclosure_headers: remove
+
+logging:
+  security_events_logged: required
+  secrets_in_logs: forbidden
+  credentials_in_logs: forbidden
+  personal_data_in_logs_ref: privacy.policy.processing.personal_data_in_logs   # canonical there
+  tamper_evident: required-for-audit
+  # Operational log transport/retention is owned by operations/logging.md (AS-014).
+
+review:
+  gate: security-review                 # quality/security-review.md, QA gate 10
+  checklist: checklists/security.md
+  threat_model_required_when: new-system-or-new-trust-boundary-or-sensitive-data
+  findings_of_consequence: blocker
+  anti_patterns: hard-fail
+  browser_verification: chrome-devtools-mcp    # TE-08

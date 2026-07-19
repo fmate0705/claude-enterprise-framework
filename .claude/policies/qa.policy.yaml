@@ -1,0 +1,78 @@
+# QA Policy
+# Framework: CEF · Specification: AS-013 (Quality Assurance Engine) · Version: 0.1.0
+# Top-level QA policy: required reviews, checklist contract, tool-assisted
+# validation, and skill routing. Single source of truth for standards/quality/overview.md.
+# Gates are owned by quality-gates.policy; scoring by review.policy; release by release.policy.
+# Documentation MUST match these values.
+
+policy: qa
+version: 0.1.0
+authority: final-before-deployment
+
+# Every review MUST exist and run.
+required_reviews:
+  - architecture-review
+  - code-review
+  - testing-review
+  - design-review
+  - ux-review
+  - brand-review
+  - content-review
+  - legal-review
+  - discoverability-review
+  - accessibility-review
+  - performance-review
+  - security-review
+  - docker-review
+  - production-readiness
+  - release-checklist
+
+# Every checklist MUST exist and be executable.
+required_checklists:
+  - architecture
+  - design
+  - content
+  - seo
+  - performance
+  - security
+  - deployment
+  - release
+  - accessibility
+  - branding
+
+# Every checklist item MUST declare these fields.
+checklist_item_contract:
+  - id
+  - description
+  - pass_condition
+  - failure_condition
+  - priority        # maps to review.policy severity levels
+  - owner
+
+# Tool-assisted validation (Constitution / tool-engine).
+tool_assisted_validation:
+  required_where_applicable: true
+  approve_without_tools: forbidden
+  routing:
+    validate_design: [ui-ux-pro-max, taste-skill]        # TE-05, TE-01
+    validate_implementation: frontend-design-skill        # TE-02
+    validate_motion: emil-motion-skill                    # TE-04
+    validate_metadata: [seo-skill, nextjs-seo]            # TE-06, TE-07
+    validate_browser_rendering: chrome-devtools-mcp       # TE-08
+    validate_generated_assets: higgsfield-mcp             # TE-09
+  fallback: tool-engine-TE-12
+
+principles:
+  shipping_is_not_finishing: true
+  ci_green_is_not_quality: true
+  quality_must_be_measurable: true
+  objective_criteria_required: true
+  verify_never_assume: true
+  report_failures_honestly: true
+  no_gate_bypass: true
+
+references:
+  gates: quality-gates.policy.yaml
+  scoring: review.policy.yaml
+  release: release.policy.yaml
+  definition_of_done: CLAUDE.md   # Constitution Article X

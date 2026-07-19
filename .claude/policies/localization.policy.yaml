@@ -1,0 +1,122 @@
+# Localization Policy
+# Framework: CEF · Specification: AS-018 (Content Operations Engine) · Version: 2.0.0
+# Canonical source of truth for localization: source language, translation workflow,
+# translation memory, locale formats, regional adaptation, publishing synchronization,
+# and fallback languages.
+#
+# Supersedes the AS-011 localization policy (v0.1.0), whose content is absorbed here
+# WITHOUT LOSS and without key changes. AS-011 retains authority over translation
+# QUALITY (adapt meaning, preserve tone) via content/localization.md and
+# content/translation.md, which are now consumers of this policy rather than owners.
+#
+# Dependents that dereference these keys (all preserved verbatim):
+#   pricing.policy.format_ref            -> locale_formats.<locale>.currency
+#   commerce/{currencies,pricing}.md     -> locale_formats.<locale>.currency
+#   content/{localization,translation}.md -> translation_workflow, rules, locale_formats
+# Documentation MUST match these values.
+
+policy: localization
+version: 2.0.0
+supersedes: localization@0.1.0   # AS-011
+
+# --- Source language. Localization begins with good source content.
+source:
+  source_language_declared: required
+  single_source_of_truth: required        # one authoritative language per content item
+  source_finalized_before_translation: required
+  translating_a_draft: forbidden          # the source changes; the translation is orphaned
+  source_written_for_translation: required  # plain, unambiguous, idiom-light
+  untranslatable_idiom_in_source: avoid
+  source_change_invalidates_translations: required   # flagged as stale, never silently kept
+
+# Translation workflow (content/translation.md) — ordered, no step skipped.
+translation_workflow:
+  - prepare        # extract source + context + glossary
+  - translate      # adapt meaning and tone (not literal)
+  - localize       # apply locale formats
+  - review         # competent target-language reviewer
+  - proofread      # final grammar/consistency pass
+  - validate       # structure, links, structured data localized
+
+rules:
+  adapt_meaning_not_words: required     # literal translation forbidden
+  preserve_intent_and_tone: required
+  human_review_before_publish: required # unreviewed machine translation forbidden
+  glossary_consistency: required
+  do_not_translate_list: enforced       # brand names, code, fixed nouns
+  preserve_markup_and_placeholders: required
+  cultural_appropriateness_check: required
+
+# --- Translation memory and glossary (AS-018).
+translation_memory:
+  maintained: required
+  reused_before_retranslating: required   # consistency and cost
+  glossary_authoritative: required
+  glossary_reviewed_by_target_reviewer: required
+  memory_never_auto_applied_without_review: required
+  fuzzy_match_reviewed: required
+
+# --- Regional adaptation (AS-018).
+regional_adaptation:
+  language_and_region_distinct: required  # pt-BR is not pt-PT
+  regional_variant_declared: required
+  content_may_differ_by_region: allowed   # legal, pricing, availability
+  regional_difference_recorded: required
+  assume_language_implies_region: forbidden
+
+# Locale formats (content/localization.md). Examples for common locales.
+locale_formats:
+  hu-HU:
+    date: "YYYY. MM. DD."
+    currency: "1 234 Ft"                # space thousands; symbol suffix
+    decimal_separator: ","
+    thousands_separator: "space"
+    units: metric
+    phone_country_code: "+36"
+    address_order: [postal_code, city, street]
+  en-GB:
+    date: "DD/MM/YYYY"
+    currency: "£1,234"
+    decimal_separator: "."
+    thousands_separator: ","
+    units: metric
+  en-US:
+    date: "MM/DD/YYYY"
+    currency: "$1,234"
+    decimal_separator: "."
+    thousands_separator: ","
+    units: imperial
+
+# --- Publishing synchronization (AS-018).
+publishing_sync:
+  strategy_declared: required           # simultaneous | source-first | independent
+  default: source-first
+  simultaneous_requires_all_locales_approved: required
+  publish_untranslated_as_translated: forbidden
+  partial_locale_state_visible_to_editors: required
+  source_unpublish_cascades: required   # a retracted source retracts its translations
+
+# --- Fallback languages (AS-018).
+fallback:
+  chain_declared: required              # e.g. hu-HU -> hu -> en
+  terminal_fallback_declared: required
+  fallback_is_explicit_not_accidental: required
+  mixed_language_page_without_notice: forbidden
+  fallback_surfaced_to_reader: required # the reader is told this is not their language
+  machine_translation_as_silent_fallback: forbidden
+  missing_translation_renders_empty: forbidden
+
+# --- Staleness. A translation is only as true as its source.
+staleness:
+  translation_linked_to_source_version: required
+  source_change_marks_translation_stale: required
+  stale_translation_flagged_to_editors: required
+  stale_translation_published_silently: forbidden
+  staleness_visible_in_editor: required
+
+consistency_with_discoverability: I18-10   # same structure, localized values
+
+review:
+  gate: content-operations-review
+  anti_patterns: hard-fail
+  waiver: recorded-scoped-user-decision-only

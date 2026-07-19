@@ -1,0 +1,122 @@
+# RAG Policy
+# Framework: CEF · Specification: AS-019 (AI Intelligence Platform Engine) · Version: 2.0.0
+# Canonical source of truth for retrieval: ingestion, chunking, embeddings, vector search,
+# retrieval, ranking, context assembly, citations, freshness, and knowledge bases.
+#
+# SCOPE. Retrieval inside PRODUCTS BUILT WITH CEF.
+# Boundaries. Content model, editorial workflow, publishing -> standards/content-operations/
+# (AS-018). Site search -> content-operations/search.md. Commerce catalog search ->
+# commerce/catalog.md (AS-017). Authorization model -> authorization.policy (AS-016).
+# Documentation MUST match these values.
+
+policy: rag
+version: 2.0.0
+
+# --- Retrieval exists to ground answers in real sources.
+principles:
+  retrieval_grounds_the_answer: required
+  context_quality_determines_output_quality: required
+  garbage_retrieved_is_garbage_generated: acknowledged
+  retrieval_is_not_a_substitute_for_a_content_model: required
+  more_chunks_assumed_better: forbidden
+
+ingestion:
+  source_inventory_maintained: required
+  source_authority_recorded: required
+  source_permissions_recorded: required     # drives retrieval-time filtering
+  ingest_validated_at_boundary: required    # IV-26
+  ingest_is_idempotent: required
+  document_identity_stable: required
+  document_version_recorded: required
+  source_of_truth_remains_the_source: required
+  ingested_copy_treated_as_authoritative: forbidden
+  ingestion_failures_surfaced: required
+
+chunking:
+  chunk_strategy_recorded: required
+  strategy_options: [fixed-size, semantic, structural, hybrid]
+  default: structural                       # follow the document's own structure
+  chunk_carries_its_context: required       # title, section, source, position
+  chunk_size_bounded: required
+  overlap_declared: required
+  mid_sentence_split: forbidden
+  structured_content_chunked_structurally: required   # tables and lists are not prose
+  chunk_metadata_required: [source_id, document_version, section, permissions]
+
+embeddings:
+  model_pinned: required
+  model_recorded_per_vector: required
+  mixing_embedding_models_in_one_index: forbidden
+  model_change_requires_full_reindex: required
+  reindex_is_a_migration: required
+  normalization_consistent: required
+  embedding_pipeline_idempotent: required
+  embedding_cost_bounded: required
+
+vector_search:
+  index_rebuildable: required
+  index_reconcilable_with_sources: required
+  similarity_metric_recorded: required
+  top_k_bounded: required
+  similarity_threshold_recorded: required
+  low_similarity_results_returned_as_matches: forbidden
+  empty_result_handled_explicitly: required
+  vector_search_as_sole_strategy: discouraged   # hybrid usually outperforms
+  hybrid_search_evaluated: recommended
+
+retrieval:
+  authorization_enforced_at_retrieval: required   # AZ-12
+  post_retrieval_filtering_as_sole_control: forbidden
+  retrieval_scoped_by_principal: required         # AZ-13
+  tenant_isolation_enforced: required             # AZ-17
+  retrieving_documents_the_user_cannot_read: forbidden
+  retrieval_is_logged: required
+
+ranking:
+  ranking_rule_documented: required
+  ranking_deterministic: required
+  reranking_evaluated: recommended
+  diversity_considered: recommended
+  recency_weighting_declared: required
+
+context_assembly:
+  assembly_rule_documented: required
+  budget_enforced: required                       # ai.policy.context
+  overflow_drops_lowest_ranked_explicitly: required
+  silent_drop: forbidden
+  retrieved_content_is_untrusted: required        # safety.policy — injection surface
+  retrieved_content_carries_instruction_authority: forbidden
+  source_attribution_preserved_into_context: required
+  duplicate_chunks_deduplicated: required
+
+# --- Citations. A citation the reader cannot verify is decoration.
+citations:
+  required_when_answer_is_grounded: required
+  citation_resolves_to_a_real_source: required
+  # fabricated_citation -> safety.policy.hallucination (canonical)
+  citation_verified_against_retrieved_set: required
+  citation_points_to_retrieved_chunk: required
+  citation_reachable_by_the_user: required
+  citation_respects_authorization: required
+  answer_without_support_states_so: required
+  unsupported_claim_presented_as_sourced: forbidden
+
+freshness:
+  freshness_requirement_declared: required
+  index_updated_on_source_change: required
+  staleness_bounded: required
+  stale_index_serves_silently: forbidden
+  deleted_source_removed_from_index: required
+  unpublished_source_removed_from_index: required # content-operations SR-03
+  index_lag_measured: required
+
+quality:
+  retrieval_evaluated_separately_from_generation: required
+  metrics: [recall, precision, mrr, answer-groundedness]
+  evaluation_set_exists: required                 # evaluation.policy
+  retrieval_failure_distinguished_from_generation_failure: required
+  no_result_is_a_valid_answer: required
+
+review:
+  gate: ai-review
+  anti_patterns: hard-fail

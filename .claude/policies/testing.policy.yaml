@@ -1,0 +1,98 @@
+# Testing Policy
+# Framework: CEF · Specification: AS-020 (Validation & Automation Engine) · Version: 2.0.0
+# Test-automation configuration: the pyramid, coverage thresholds, per-layer rules,
+# critical journeys, and forms/API validation.
+#
+# SCOPE. This policy owns test AUTOMATION config. Test DESIGN — behavior-not-implementation,
+# arrange-act-assert, one-reason-to-fail, edge-case discipline — is owned by M-TEST
+# (standards/testing.md, E-099…E-104) and is NOT restated here. Documentation MUST match.
+
+policy: testing
+version: 2.0.0
+review_ref: validation.policy.yaml    # the review gate is owned by validation.policy
+
+# --- The pyramid (proportion and placement; TST).
+pyramid:
+  order: [static-analysis, unit, integration, e2e, manual-exploratory]
+  base: static-analysis                 # TSG-01
+  most_numerous: unit                   # TSG-02
+  fewest_automated: e2e                 # TSG-03
+  manual_is_never_the_foundation: required   # TSG-04
+  test_at_lowest_sufficient_layer: required  # TSG-05
+  inverted_pyramid: forbidden           # VAP-002
+
+# --- Coverage thresholds (owned here; enforced at build; XVV-08).
+# Percentages are minimums; behavior coverage of critical paths is mandatory regardless.
+coverage:
+  measured_on: behavior                 # VLP-27 — lines are a proxy, not the goal
+  unit_min_percent: 80
+  critical_path_percent: 100            # VLP-28 — critical paths fully covered
+  new_logic_ships_with_tests: required  # UNT-14
+  threshold_lowered_only_by_recorded_decision: required   # UNT-15 / ME-08
+  ratchets_forward: required            # BMK-08
+
+# --- Unit layer (UNT).
+unit:
+  covers: [business-logic, pure-functions, utilities, validation-functions, hooks, state-logic, error-paths]
+  isolation_required: required          # UNT-07
+  mock_the_dependency_not_the_unit: required   # UNT-08
+  over_mocking: forbidden               # UNT-10 / VAP-024
+  clock_and_randomness_injected: required      # UNT-11
+  boundary_inputs_required: required    # UNT-02
+
+# --- Integration layer (IGT).
+integration:
+  covers: [component-interaction, api-integration, auth-flows, database, third-party, error-handling-across-seam]
+  real_or_contract_faithful: required   # IGT-07
+  mock_the_seam: forbidden              # VAP-031
+  ephemeral_isolated_dependencies: required    # IGT-08
+  real_database_engine: required        # IGT-04
+  unhappy_path_required: required       # IGT-10
+  state_reset_between_tests: required   # IGT-11
+  contract_tests_at_external_boundaries: required  # IGT-14
+
+# --- End-to-end layer (E2E).
+e2e:
+  runs_against: production-build         # E2E-04
+  deterministic_isolated: required       # E2E-05
+  semantic_stable_selectors: required    # E2E-06
+  waits_on_conditions_not_time: required # E2E-07
+  network_controlled: required           # E2E-08
+  few_by_design: required                # E2E-10
+critical_journeys:                       # E2E-02 — covered where present
+  - authentication            # sign-up, sign-in, sign-out, reset, session expiry, unauthorized
+  - checkout                  # cart -> payment -> confirmation, declined, out-of-stock (M-COMMERCE)
+  - forms                     # submit, validate, recover, preserve input
+  - search                    # query, results, empty, filters, pagination
+  - navigation                # routes reachable, deep links, back/forward, 404
+  - admin-workflows           # privileged actions gated by authorization (M-SEC)
+  - content-publishing        # draft -> review -> publish -> visible; unpublish; scheduled (M-CONTENTOPS)
+  failing_critical_journey_blocks_release: required   # E2E-11 / RLV-06
+
+# --- Forms (FMT). Design owned by experience/components; security by M-SEC.
+forms:
+  success_confirmed: required            # FRM-01
+  inline_validation_verified: required   # FRM-02
+  input_preserved_on_failure: required   # FRM-04
+  double_submit_prevented: required      # FRM-05
+  labels_associated_verified: required   # FRM-07
+  server_side_validation_verified: required  # FRM-11
+  hostile_input_exercised: required      # FRM-12 (severity = M-SEC)
+
+# --- API (APT). Design/security owned by architecture/M-SEC.
+api:
+  request_validation_verified: required  # APT-01
+  response_conforms_to_contract: required # APT-02
+  status_codes_correct: required         # APT-03
+  error_responses_safe: required         # APT-04
+  authz_negative_case_tested: required   # APT-07
+  rate_limit_verified: required          # APT-08 (value = rate-limiting.md)
+  contract_tests_required: required      # APT-09
+  breaking_change_versioned: required    # APT-10
+  unhappy_path_exercised: required       # APT-12
+
+# --- Flakiness (VLP-20).
+reliability:
+  flaky_is_broken: required
+  retry_into_green: forbidden            # AUT-14 / VAP-012
+  quarantine_with_owner_and_deadline: required

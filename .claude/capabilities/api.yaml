@@ -1,0 +1,68 @@
+# Capability: API
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+
+capability: api
+version: 1.0.0
+
+classification:
+  aliases: [api, headless service, backend service, rest api, web service]
+  signals:
+    goal: serve-data
+    audience: machines
+    surfaces: none               # no visual surface
+    data: transactional
+    auth: keys-or-oauth
+    commerce: none
+complexity_default: complex
+
+engines:
+  required:
+    - architecture
+    - platform
+    - content                    # minimal: API documentation only
+    - quality
+    - operations
+  excluded:
+    - engine: components
+      reason: "No presentation layer; the service has no UI components."
+    - engine: experience
+      reason: "No visual surface to design; there is no user-facing interface."
+    - engine: motion
+      reason: "No interface to animate."
+    - engine: assets
+      reason: "No brand-asset production surface."
+    - engine: discoverability
+      reason: "No public HTML surface; discovery is served by a versioned OpenAPI contract and docs rather than crawler metadata."
+
+skills: []                       # no design skills apply to a headless service
+mcps: []                         # browser/imagery MCPs do not apply; a docs UI, if built, re-classifies
+
+legal_documents:
+  - privacy-policy               # when the API processes personal data
+  - terms-of-service             # API usage terms
+  optional: [imprint]
+
+assets: []
+
+workflow:
+  project_type: PT-K            # workflow-engine/project-types.md
+  states: all
+  skipped: [S05, S06, S07]      # brand, UX, UI — no visual surface (PT-K)
+  replaced:
+    S10: contract-and-integration-review    # browser review -> contract conformance
+    S12: api-discoverability                # SEO -> OpenAPI + versioned docs
+  emphasis: [S08, S13, S14]     # architecture, latency/throughput, security
+  deltas: [openapi-contract, versioning, rate-limiting, auth, contract-tests]
+
+profiles:
+  architecture: api             # standards/architecture/project-types.md (API Base)
+  density: none
+  motion_level: none
+  page_sections: none
+
+validation:
+  gates: all-applicable
+  not_applicable: [4, 5, 8]     # experience, motion, accessibility — no UI surface
+  floors_still_apply: [security, performance]   # a11y applies only to any docs UI
+  emphasis: [security, architecture, performance, testing]
+  release_verification: all-except-images-optimized

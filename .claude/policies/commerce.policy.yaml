@@ -1,0 +1,174 @@
+# Commerce Policy
+# Framework: CEF · Specification: AS-017 (Commerce Platform Engine) · Version: 2.0.0
+# Canonical source of truth for the product model, catalog, inventory, subscriptions,
+# fulfilment, transactional email, commerce metrics, and the commerce review gate.
+#
+# Boundaries. Money and price display -> pricing.policy. Checkout flow -> checkout.policy.
+# Payment integration -> payments.policy. Order states -> orders.policy. Authentication ->
+# authentication.policy (M-SEC). Product page COPY -> content/products.md (AS-011).
+# Analytics COLLECTION -> operations/analytics.md (AS-014). Currency FORMATTING ->
+# localization.policy. CTA hierarchy -> conversion.policy (AS-008).
+# Documentation MUST match these values.
+
+policy: commerce
+version: 2.0.0
+
+# --- Product types. Every product resolves to exactly one type.
+product_types: [digital, physical, service, subscription, license, bundle, gift-card, membership]
+
+product_model:
+  type_explicit: required
+  attributes_required: [id, type, name, status, price, currency]
+  status_values: [draft, active, archived]
+  archived_purchasable: forbidden
+  archived_order_history_retained: required   # orders.policy.record
+  deletion_of_purchased_product: forbidden    # archive instead; history must resolve
+  sku_unique: required
+  delivery_model_declared: required
+  availability_declared: required
+  lifecycle_declared: required
+
+variants:
+  option_axes_explicit: required
+  variant_is_the_purchasable_unit: required
+  price_per_variant_supported: required
+  stock_per_variant: required
+  unavailable_combination_selectable: forbidden
+  default_variant_defined: required
+  variant_reflected_in_url: recommended
+
+catalog:
+  collections_supported: required
+  categories_single_hierarchy: required
+  tags_non_hierarchical: required
+  search_server_side: required
+  filter_fields_allowlisted: required        # API-19
+  sort_fields_allowlisted: required
+  filter_state_in_url: required              # shareable, back-button safe
+  empty_result_state: required               # D-083
+  pagination_bounded: required               # API-18
+  recommendations_explainable: required
+  recommendations_fabricated: forbidden
+  recently_viewed_client_scoped: required
+  personal_data_in_recently_viewed: minimize # privacy.policy
+
+# --- Inventory. Overselling is a trust failure, not an edge case.
+inventory:
+  authoritative_source: server
+  decremented_on_order_creation: required
+  reserved_during_checkout: recommended
+  reservation_expires: required
+  oversell_without_policy: forbidden
+  backorder_explicit_when_allowed: required
+  out_of_stock_purchasable: forbidden
+  stock_check_atomic: required               # race conditions oversell
+  stock_released_on_cancellation: required
+  stock_released_on_reservation_expiry: required
+  displayed_availability_accurate: required
+  exact_stock_count_displayed: optional
+  digital_stock_unlimited_by_default: required
+
+subscriptions:
+  plan_explicit: required
+  billing_interval_explicit: required
+  trial_terms_explicit: required
+  trial_converts_only_with_prior_disclosure: required
+  renewal_reminder_before_charge: required
+  cancellation_self_service: required        # cancelling MUST NOT require contacting support
+  cancellation_effective_date_stated: required
+  access_until_period_end_on_cancel: required
+  proration_rule_defined: required
+  proration_applied_deterministically: required
+  upgrade_immediate_by_default: required
+  downgrade_at_period_end_by_default: required
+  failed_renewal_retry_schedule_defined: required
+  dunning_communicates_before_termination: required
+  silent_termination: forbidden
+  price_change_notified_before_charge: required
+  reactivation_supported: recommended
+
+fulfilment:
+  triggered_by: verified-payment-confirmation   # payments.policy.fulfilment_trigger
+  digital_delivery_immediate: required
+  digital_link_expiring: required
+  digital_link_authorized: required             # AZ-15; unguessable is not authorized
+  digital_download_limit_defined: required
+  physical_tracking_when_available: required
+  status_updates_sent: required
+  third_party_logistics_behind_interface: required
+  pickup_supported_when_declared: required
+  partial_fulfilment_supported: required
+  fulfilment_failure_surfaced: required
+
+returns:
+  policy_stated_before_purchase: required
+  window_explicit: required
+  process_self_service: recommended
+  return_state_tracked: required
+  refund_on_return_receipt: required
+  restocking_fee_disclosed_before_purchase: required
+
+# --- Transactional email. Required by event.
+emails:
+  required_events:
+    - order-confirmation
+    - payment-failure
+    - shipping-update
+    - invoice-delivery
+    - subscription-renewal-reminder
+    - subscription-cancellation-confirmation
+    - refund-confirmation
+  order_confirmation_timing: immediate
+  transactional_separate_from_marketing: required
+  marketing_consent_required: required        # privacy.policy.consent
+  transactional_requires_marketing_consent: forbidden
+  unsubscribe_in_marketing: required
+  unsubscribe_in_transactional: forbidden     # a receipt is not marketing
+  plain_text_alternative: required
+  accessible_html: required
+  content_renders_without_images: required
+  order_reference_present: required
+  full_card_number_in_email: forbidden        # payments.policy.card_data
+  password_in_email: forbidden                # PW-18
+  abandoned_cart_requires_consent: required
+  review_request_requires_consent: required
+  delivery_failure_monitored: required
+
+# --- Metrics. Definitions only; collection is owned by operations/analytics.md.
+metrics:
+  collection_owner: standards/operations/analytics.md
+  definitions_required: [revenue, conversion-rate, average-order-value, customer-lifetime-value, retention, cart-abandonment, checkout-completion, refund-rate, return-rate]
+  definition_documented: required
+  definition_stable: required                 # a redefined metric breaks every comparison
+  revenue_net_or_gross_stated: required
+  refunds_reflected_in_revenue: required
+  test_orders_excluded: required
+  personal_data_minimized: required           # privacy.policy.processing
+  tracking_before_consent: forbidden          # PRV-20
+  fabricated_metric: forbidden
+
+skills:
+  storefront_hierarchy: taste-skill                  # TE-01
+  storefront_layout: frontend-design-skill           # TE-02
+  storefront_ux: ui-ux-pro-max                       # TE-05
+  checkout_ux: emil-frontend-design-skill            # TE-03
+  browser_validation: chrome-devtools-mcp            # TE-08
+  product_imagery: higgsfield-mcp                    # TE-09
+  metadata: seo-skill                                # TE-06
+  nextjs_metadata: nextjs-seo-skill                  # TE-07
+
+review:
+  gate: commerce-review
+  areas: [catalog, pricing, checkout, payments, accessibility, performance, localization, emails, notifications, analytics]
+  checklist: checklists/commerce.md
+  anti_patterns: hard-fail
+  floors: [accessibility, security, performance, legal]
+  waiver: recorded-scoped-user-decision-only
+
+legal:
+  required_documents: [terms-of-sale, refund-policy, shipping-policy, privacy-policy]
+  subscription_disclosures_required: required
+  content_owner: standards/content/legal-pages.md    # AS-011
+  discipline_owner: standards/security/legal-considerations.md   # AS-016
+  mandatory_disclaimer: required
+  publication_without_legal_review: forbidden

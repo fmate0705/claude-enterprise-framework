@@ -1,0 +1,65 @@
+# Memory Policy
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+# Canonical runtime memory model: the store, the required content, update triggers,
+# and the AS-015 name mapping. Single source of truth for runtime/memory-manager.md.
+# Memory RULES are owned by rules/memory-engine.md (ME-01..12) and referenced here.
+# Documentation MUST match these values.
+
+policy: memory
+version: 1.0.0
+
+# One canonical store. A second store would duplicate ownership (KV-05) and
+# break every engine's references. Recorded reconciliation: runtime/memory-manager.md.
+canonical_store: .claude/memory/
+second_store: forbidden
+rules_owner: rules/memory-engine.md      # ME-01..12
+module_owner: M-MEMORY                    # knowledge/modules.md
+
+# AS-015 naming projection -> canonical file.
+name_mapping:
+  memory.md: memory/project.md
+  decision-log.md: memory/decisions.md
+  progress.md: memory/session.md
+  todos.md: memory/todos.md
+  handover.md: memory/handover.md         # new canonical artifact (AS-015)
+
+# Required content -> canonical location (runtime/memory-manager.md).
+content_map:
+  project-summary: memory/project.md
+  architecture-decisions: memory/architecture.md
+  design-decisions: memory/design-system.md
+  brand-decisions: memory/branding.md
+  content-decisions: memory/decisions.md
+  technology-decisions: memory/architecture.md
+  open-tasks: memory/todos.md
+  known-issues: memory/todos.md
+  completed-milestones: memory/session.md
+  client-preferences: memory/client.md
+  future-work: memory/todos.md
+  session-handover: memory/handover.md
+  execution-strategy: memory/project.md    # classification, capability, engines, plan
+
+read_triggers:
+  session_start: [memory/project.md, memory/handover.md, memory/session.md]
+  before_architecture_decision: [memory/architecture.md, memory/decisions.md]
+  before_design_work: [memory/design-system.md, memory/branding.md]
+  before_deployment: [memory/deployment.md]
+  before_stakeholder_decision: [memory/client.md]
+
+update_triggers:
+  every_session: required
+  every_milestone: [memory/session.md, memory/todos.md]
+  significant_decision: memory/decisions.md
+  state_change: memory/session.md
+  session_end: memory/handover.md
+  reality_change: same-unit-of-work        # ME-09
+
+rules:
+  read_before_acting: required             # ME-01, ME-12
+  never_rediscover_recorded_decisions: required   # ME-10
+  overwrite_without_reason: forbidden      # ME-08
+  keep_memory_true: required               # ME-09
+  record_assumptions: required             # ME-11
+  secrets_in_memory: forbidden             # values; locations only
+  duplicate_facts_across_files: forbidden  # KV-05
+  stale_memory_at_release: forbidden       # quality gate 13

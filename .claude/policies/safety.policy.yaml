@@ -1,0 +1,119 @@
+# AI Safety Policy
+# Framework: CEF · Specification: AS-019 (AI Intelligence Platform Engine) · Version: 2.0.0
+# Canonical source of truth for AI guardrails: prompt injection resistance, tool safety,
+# output validation, hallucination mitigation, and human review.
+#
+# SCOPE. AI-specific threats in PRODUCTS BUILT WITH CEF. The general security model —
+# default deny, enforcement, secrets, input validation, authorization — is owned by
+# security.policy / authorization.policy (AS-016) and is NEVER restated here. Where this
+# file appears to conflict with M-SEC, M-SEC governs.
+# Privacy, consent, retention -> privacy.policy (AS-016).
+# Documentation MUST match these values.
+
+policy: ai-safety
+version: 2.0.0
+defers_to: [security.policy, authorization.policy, privacy.policy]   # AS-016 governs on conflict
+
+# --- The premise: a model's output is a suggestion, never an authority.
+posture:
+  model_output_is_untrusted_input: required     # the single most important rule here
+  model_output_as_a_security_decision: forbidden
+  model_output_as_an_authorization_decision: forbidden
+  prompt_as_a_security_boundary: forbidden
+  guardrails_are_defense_in_depth_not_the_control: required   # SF-05
+  fail_closed: required                          # SF-06
+  ai_failure_is_expected_not_exceptional: required
+
+# --- Prompt injection. Assume it will happen; it is not fully solvable by prompting.
+prompt_injection:
+  treated_as_unsolved: required
+  mitigation_is_layered_not_absolute: required
+  trust_boundary_between_layers_enforced: required   # prompt.policy.layer_rules
+  untrusted_sources: [user-input, retrieved-content, tool-results, memory, documents, images, web-content, mcp-server-responses]
+  # untrusted_content_granted_instruction_authority -> prompt.policy.layer_rules (canonical)
+  instruction_authority_derives_from_layer_not_content: required
+  delimiting_as_sole_defense: forbidden          # delimiters are guessable
+  please_ignore_injections_as_a_defense: forbidden
+  indirect_injection_considered: required         # poisoned document, poisoned memory
+  injection_via_retrieved_content_defended: required
+  injection_via_memory_defended: required
+  injection_via_tool_result_defended: required
+  multimodal_injection_considered: required       # text inside an image
+  the_real_control_is_least_privilege: required   # SF-14 — bound what a compromised turn can do
+
+# --- Tool safety. This is where injection becomes damage.
+tool_safety:
+  authority_bounded_by_the_principal: required    # agents.policy.tools
+  authorization_enforced_server_side: required    # AZ-05
+  model_chosen_tool_input_validated: required
+  destructive_tools_require_approval: required
+  sensitive_actions_require_approval: required    # agents.policy.sensitive_actions
+  approval_shows_the_resolved_action: required
+  tool_surface_minimal: required                  # AG-22
+  read_and_write_tools_separated: required
+  a_compromised_turn_must_not_escalate: required
+
+# --- Output validation. Never render or execute model output unchecked.
+output_validation:
+  schema_validated_when_structured: required
+  validation_failure_handled: required
+  invalid_output_retried_bounded: required
+  invalid_output_passed_downstream: forbidden
+  output_encoded_for_its_context: required        # OE-01
+  model_output_rendered_as_raw_html: forbidden    # OE-04
+  model_output_executed_as_code: forbidden-without-sandbox
+  model_generated_query_parameterized: required   # SQL-01
+  model_generated_url_allowlisted: required       # IV-20, IV-21
+  model_generated_path_resolved_against_base: required   # IV-22
+  output_length_bounded: required
+  output_scanned_for_leaked_secrets: required
+  output_scanned_for_leaked_system_prompt: recommended
+  output_scanned_for_personal_data: required      # privacy.policy
+
+# --- Hallucination. A confident wrong answer is the default failure mode.
+hallucination:
+  treated_as_expected_behavior: required
+  fluency_mistaken_for_accuracy: forbidden
+  grounding_required_for_factual_claims: required   # rag.policy
+  citations_verified_against_sources: required
+  fabricated_citation: forbidden
+  unsupported_answer_states_uncertainty: required
+  model_permitted_to_say_it_does_not_know: required
+  refusal_path_exists: required
+  measurement_required: required                    # evaluation.policy
+  confidence_from_the_model_treated_as_calibrated: forbidden
+  high_stakes_output_verified_independently: required
+  self_verification_as_sole_check: forbidden        # a model grading itself is not a control
+
+# --- Human review. The control that makes the rest safe to be wrong.
+human_review:
+  required_when: [irreversible, external-facing, financial, legal, medical, safety-relevant, personal-data-disclosure, low-confidence]
+  reviewer_sees_the_actual_output: required
+  reviewer_sees_the_grounding: required
+  reviewer_can_reject: required
+  rejection_reason_recorded: required
+  review_is_not_a_rubber_stamp: required
+  review_load_bounded: required                     # unreviewable volume is unreviewed
+  automation_bias_considered: required              # reviewers approve what looks confident
+  bypass_recorded: required
+
+data_protection:
+  ref: privacy.policy                               # AS-016 — canonical
+  secrets_in_context: forbidden                     # SM-05
+  personal_data_to_provider_recorded: required      # PRV-29 — a provider is a processor
+  data_used_for_provider_training: recorded-decision-only
+  provider_retention_understood: required
+  special_category_data_to_a_model: forbidden-without-legal-review
+
+transparency:
+  ai_involvement_disclosed: required
+  ai_output_presented_as_human: forbidden
+  limitations_stated: required
+  confidence_communicated_honestly: required
+  fabricated_capability_claim: forbidden            # Article IV
+
+review:
+  gate: ai-review
+  anti_patterns: hard-fail
+  floors: [security, privacy, legal]
+  waiver: recorded-scoped-user-decision-only

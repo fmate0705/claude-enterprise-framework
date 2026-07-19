@@ -1,0 +1,46 @@
+# Benchmark Policy
+# Framework: CEF · Specification: AS-020 (Validation & Automation Engine) · Version: 2.0.0
+# Benchmarking cadence, baselines, and regression tolerance. Turns point-in-time checks into
+# trends and ratcheting baselines.
+#
+# SCOPE. Absolute budgets and thresholds are owned by their engines and referenced via
+# validation.policy.references — CWV by discoverability.policy, bundle by platform/performance.md,
+# WCAG by M-A11Y. This policy owns only cadence, baselines, and tolerance. Documentation MUST match.
+
+policy: benchmark
+version: 2.0.0
+review_ref: validation.policy.yaml
+thresholds_ref: validation.policy.yaml   # references.* — absolute budgets owned by their engines
+
+# --- What is benchmarked (BMK).
+metrics:
+  performance: [lcp, cls, inp, bundle-size, hydration-cost, build-time]   # budgets = owners
+  quality: [test-coverage, accessibility-violations, lighthouse-scores, open-findings]
+  fabricated_metric: forbidden           # BMK-12 / VAP — measured values only
+
+# --- Baselines (BMK-03, BMK-04).
+baselines:
+  recorded_baseline_required: required   # BMK-03
+  fixed_conditions_required: required    # BMK-04 — device/network/env held constant
+  stored_and_versioned: required
+  location: memory/deployment.md         # trend history recorded to memory (RPT-07)
+
+# --- Regression tolerance (owned here; BMK-05, BMK-06).
+tolerance:
+  regression_past_tolerance_blocks: required   # BMK-05 / PRT-12
+  set_above_measurement_noise: required        # BMK-06 — avoids false blocks
+  performance_regression_percent: 5            # a metric worsening >5% vs baseline blocks
+  coverage_regression_points: 0                # coverage MUST NOT drop below baseline
+  single_noisy_run_does_not_block: required    # VLP-16
+
+# --- Ratcheting (BMK-08, BMK-09).
+ratchet:
+  improvements_protected_as_new_floor: required   # BMK-09
+  loosening_baseline_requires_recorded_decision: required   # BMK-08 / ME-08
+  silent_backward_move: forbidden
+
+# --- Cadence (BMK-10).
+cadence:
+  runs_on: [schedule, release-candidate]
+  schedule_ref: automation.policy.yaml   # schedules owned by automation.policy
+  trends_durable_and_reviewable: required   # BMK-11

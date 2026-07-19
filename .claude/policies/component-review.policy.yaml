@@ -1,0 +1,64 @@
+# Component Review Policy
+# Framework: CEF · Specification: AS-007 (Component Engine) · Version: 0.1.0
+# Machine-readable review gates mirroring standards/components/review.md.
+# Every component MUST pass all checks at the code-review gate (workflow G09).
+
+policy: component-review
+version: 0.1.0
+appliesTo: "**/*.{tsx,jsx}"
+gate: code-review
+
+checks:
+  - id: CRV-01
+    name: single-responsibility
+    severity: blocker
+    pass: "one responsibility, exactly one category; no God Component"
+    refs: [CPH-01, CTX-10, CAP-01]
+  - id: CRV-02
+    name: accessibility
+    severity: blocker
+    pass: "WCAG 2.2 AA; keyboard, focus, labels, contrast; a11y lint clean"
+    refs: [CPH-05, CVL-04]
+  - id: CRV-03
+    name: typing
+    severity: blocker
+    pass: "all props typed; no any; unions for exclusive combinations"
+    refs: [CPR-01, CPR-04, CVL-03]
+  - id: CRV-04
+    name: performance
+    severity: major
+    pass: "server-first; minimal client JS; optimized media; no premature memo"
+    refs: [RC-12, PERF-01, CAP-13]
+  - id: CRV-05
+    name: composition
+    severity: major
+    pass: "composition over inheritance; slots over flags; downward direction"
+    refs: [CMP-01, CTX-11, CVL-05]
+  - id: CRV-06
+    name: naming
+    severity: major
+    pass: "conventions followed; named exports; intent-revealing"
+    refs: [naming, CAP-08]
+  - id: CRV-07
+    name: readability
+    severity: major
+    pass: "within component_max_lines (200) and jsx_max_nesting_depth (4)"
+    refs: [CAP-03, CAP-04, component-limits]
+  - id: CRV-08
+    name: testability
+    severity: major
+    pass: "behavior tested; colocated tests cover the contract"
+    refs: [TST-01, TST-09]
+  - id: CRV-09
+    name: documentation
+    severity: major
+    pass: "component contract complete; no hidden behavior"
+    refs: [CFS-contract, CPH-04]
+
+enforcement:
+  blocker: block-completion
+  major: fix-before-completion
+  minor: fix-or-record-waiver
+  waiver: recorded-scoped-user-decision-only
+  floors: [CRV-02]              # accessibility never waived below AA
+  reference_limits: component-limits.policy.yaml

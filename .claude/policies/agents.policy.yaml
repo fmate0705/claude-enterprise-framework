@@ -1,0 +1,149 @@
+# Agents Policy
+# Framework: CEF · Specification: AS-019 (AI Intelligence Platform Engine) · Version: 2.0.0
+# Canonical source of truth for agents: architectures, tool calling, MCP integration,
+# multi-agent composition, workflow orchestration, approval, and escalation.
+#
+# SCOPE. Agents and tools inside PRODUCTS BUILT WITH CEF.
+# ⚠️ NOT CEF's own MCP usage — that is runtime/mcp-manager.md and rules/tool-engine.md
+# (AS-015/AS-002), which govern how CEF invokes Chrome DevTools MCP, Higgsfield MCP, etc.
+# Boundaries. Authorization model -> authorization.policy (AS-016). Guardrails ->
+# safety.policy. Prompts -> prompt.policy. Retrieval -> rag.policy.
+# Documentation MUST match these values.
+
+policy: agents
+version: 2.0.0
+
+# --- Agents are the most expensive and least predictable AI architecture.
+admission:
+  simplest_sufficient_architecture: required
+  escalation_order: [single-call, workflow, agent, multi-agent]
+  agent_when: task-is-open-ended-and-cannot-be-fully-specified-in-advance
+  agent_for_a_specifiable_task: forbidden
+  admission_criteria: [complexity, value, viability, cost-of-error]
+  cost_of_error_recoverable: required
+  admission_decision_recorded: required
+  agent_because_it_is_interesting: forbidden
+
+# --- Architectures. Each role is explicit.
+architectures:
+  single_agent:
+    when: one-loop-one-tool-surface
+    default: true
+  supervisor:
+    when: work-decomposes-into-independent-subtasks
+    supervisor_does_not_execute: required
+  specialist:
+    when: a-subtask-needs-a-distinct-tool-surface-or-prompt
+  planner:
+    when: ordering-must-be-decided-before-acting
+    plan_inspectable: required
+  reviewer:
+    when: output-must-be-checked-before-it-counts
+    reviewer_distinct_from_producer: required
+  executor:
+    when: actions-have-side-effects
+    executor_authority_narrowest: required
+
+architecture_rules:
+  role_explicit: required
+  role_boundaries_declared: required
+  delegation_depth_bounded: required
+  agent_spawning_agents_unbounded: forbidden
+  concurrency_bounded: required
+  multi_agent_before_single_agent_is_proven: forbidden
+
+# --- The loop. Unbounded loops are the defining agent failure.
+loop:
+  iteration_limit_required: required
+  wall_clock_limit_required: required
+  cost_limit_required: required
+  token_budget_required: required
+  unbounded_loop: forbidden
+  loop_termination_condition_explicit: required
+  progress_detected: required
+  no_progress_terminates: required
+  loop_exhaustion_surfaced: required
+  loop_exhaustion_treated_as_success: forbidden
+
+# --- Tool calling.
+tools:
+  # tool_surface_minimal -> safety.policy.tool_safety (canonical)
+  every_tool_justified: required
+  tool_description_states_when_to_use: required
+  tool_schema_typed_and_validated: required     # IV-04
+  tool_input_from_model_is_untrusted: required  # AIP-27 — model output is input
+  tool_input_validated_server_side: required
+  tool_result_validated: required               # IV-26
+  parallel_calls_returned_together: required
+  failed_tool_returns_an_error_result: required
+  tool_error_swallowed: forbidden
+  tool_execution_authorized: required           # AZ-06
+  tool_authority_is_the_principals_not_the_agents: required
+  blind_tool_execution: forbidden
+  idempotency_for_mutating_tools: required
+  timeouts_on_every_tool: required              # E-049
+  tool_calls_logged: required
+
+# --- Sensitive actions. The agent proposes; a human disposes.
+sensitive_actions:
+  classification_required: required
+  criteria: [irreversible, external-facing, financial, destructive, privileged, personal-data]
+  human_approval_required: required
+  approval_shows_the_exact_action: required
+  approval_is_per_action: required
+  blanket_pre_approval: forbidden
+  approval_bypass_recorded: required
+  approval_fatigue_considered: required          # too many prompts trains reflexive approval
+  agent_approves_its_own_action: forbidden
+  approval_recorded: required                    # AL-02
+
+escalation:
+  escalation_path_defined: required
+  escalation_triggers: [low-confidence, repeated-failure, out-of-scope, policy-boundary, budget-exhausted]
+  escalation_preserves_context: required
+  escalation_reaches_a_human: required
+  silent_give_up: forbidden
+  agent_fabricates_to_avoid_escalating: forbidden
+
+human_intervention:
+  interruptible: required
+  state_inspectable: required
+  intervention_does_not_corrupt_state: required
+  takeover_supported: required
+
+# --- MCP. Provider-agnostic integration of external capability.
+mcp:
+  scope: mcp-in-products-built-with-cef
+  not_this_policy: runtime/mcp-manager.md        # CEF's own MCP usage (AS-015)
+  discovery_explicit: required
+  server_allowlisted: required
+  arbitrary_server_connection: forbidden
+  capability_negotiated_not_assumed: required
+  capability_change_detected: required
+  authentication_required: required
+  credentials_never_in_the_model_context: required   # SM-05
+  credentials_never_in_the_sandbox: preferred
+  tool_registration_reviewed: required
+  registered_tools_are_a_trust_decision: required
+  server_tool_description_is_untrusted: required     # a server can describe a tool deceptively
+  execution_lifecycle_defined: [discover, negotiate, authenticate, register, execute, validate, handle-error]
+  timeouts_required: required
+  errors_surfaced: required
+  fallback_defined: required
+  fail_safe_never_open: required                     # INT-15
+  server_availability_monitored: required
+  server_changes_reviewed: required
+
+orchestration:
+  workflow_deterministic_where_possible: required
+  model_decides_control_flow_only_when_necessary: required
+  state_machine_explicit: required
+  state_server_authoritative: required
+  retries_bounded_and_idempotent: required
+  partial_failure_handled: required
+  compensation_defined_for_side_effects: required
+  workflow_observable: required                      # ai.policy.observability
+
+review:
+  gate: ai-review
+  anti_patterns: hard-fail

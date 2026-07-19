@@ -1,0 +1,64 @@
+# Discoverability Policy
+# Framework: CEF · Specification: AS-010 (Discoverability Engine) · Version: 0.1.0
+# Canonical heading hierarchy, internal-linking rules, performance-signal
+# thresholds, sitemap inclusion, and review gates. Single source of truth for
+# discoverability/content-structure.md, internal-linking.md, performance-signals.md,
+# sitemap.md, review.md. Documentation MUST match these values.
+
+policy: discoverability
+version: 0.1.0
+
+heading_hierarchy:
+  h1_per_page: 1                 # exactly one
+  sequential_levels: required    # no skipping
+  headings_for_styling: forbidden
+  descriptive_headings: required
+
+internal_linking:
+  descriptive_anchor_text: required
+  generic_anchor_text: forbidden   # "click here"/"read more" as sole anchor
+  max_click_depth: 3               # important pages reachable within 3 clicks
+  orphan_pages: forbidden          # every page has >=1 inbound link
+  links_to_canonical: required
+  broken_links: forbidden
+  bidirectional_hierarchy: required
+
+# Core Web Vitals "good" thresholds (durable web standard). A project's
+# performance budget MAY be stricter (platform/performance.md is the floor).
+performance_signals:
+  lcp_ms_max: 2500
+  inp_ms_max: 200
+  cls_max: 0.1
+  https: required
+  mobile_friendly: required
+  server_rendered_content: required
+  measured: required               # Lighthouse/CWV, Chrome DevTools MCP
+
+sitemap:
+  present: required
+  include: indexable-canonical-only
+  exclude: [noindex, non-canonical, redirected]
+  current_on_route_change: required
+  referenced_in_robots: required
+
+# SEO/discoverability review gates (discoverability/review.md).
+review_gates:
+  - metadata
+  - semantics
+  - structured-data
+  - links
+  - performance
+  - accessibility
+  - canonical
+  - open-graph
+  - robots
+  - sitemap
+  - llms
+
+enforcement:
+  gate: seo-validation            # workflow S12
+  performance: floor
+  accessibility: floor
+  anti_patterns: hard-fail
+  waiver: recorded-scoped-user-decision-only
+  aligns_with: rules/seo-engine.md   # SE-01..13

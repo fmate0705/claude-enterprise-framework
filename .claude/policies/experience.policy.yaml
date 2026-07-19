@@ -1,0 +1,75 @@
+# Experience Policy
+# Framework: CEF · Specification: AS-008 (Experience Engine) · Version: 0.1.0
+# Top-level experience policy: density profiles, accessibility thresholds,
+# skill routing, premium sources, and review gates. Single source of truth for
+# density and accessibility thresholds. Documentation MUST match these values.
+
+policy: experience
+version: 0.1.0
+
+# Content-density profiles (experience/content-density.md).
+density_profiles:
+  spacious:
+    product_types: [landing]
+    section_padding_px: [96, 128]
+  comfortable:
+    product_types: [corporate, marketing]
+    section_padding_px: [80, 96]
+    reading_measure_ch: [45, 75]
+  reading:
+    product_types: [blog, documentation]
+    section_padding_px: [48, 64]
+    reading_measure_ch: [65, 75]
+  dense:
+    product_types: [dashboard, admin]
+    section_padding_px: [16, 32]
+
+# Accessibility thresholds (experience/accessibility.md, mobile.md).
+# Contrast ratios are owned by design.policy.contrast_ratio.
+accessibility_thresholds:
+  min_body_font_ref: typography.policy.base_body_px   # canonical 16
+  min_touch_target_px: 44       # canonical here; referenced by conversion.policy
+  min_target_gap_px: 8
+  visible_focus: required
+  keyboard_operable: required
+  honor_reduced_motion: required
+  contrast_ref: design.policy.contrast_ratio
+
+# Deterministic skill routing (mirrors rules/tool-engine.md TE-01..05).
+skill_routing:
+  visual_hierarchy_or_taste: taste-skill
+  layout_composition: frontend-design-skill
+  interaction_polish: emil-frontend-design-skill
+  animation_motion: emil-motion-skill
+  ux_validation: ui-ux-pro-max
+  fallback: tool-engine-TE-12
+
+# Premium component sources (owned by components/patterns.md Part C; TE-10).
+premium_sources:
+  order: [shadcn/ui, magic-ui, aceternity-ui, origin-ui, 21st.dev]
+  rules:
+    copy_directly: forbidden
+    extract_patterns: required
+    adapt_to_design_tokens: required
+    maintain_consistency: required
+    mix_unrelated_visual_languages: forbidden
+
+# Design review gates (experience/review.md).
+review_gates:
+  - hierarchy
+  - typography
+  - spacing
+  - rhythm
+  - accessibility
+  - brand-consistency
+  - conversion
+  - visual-balance
+  - responsive-behavior
+  - information-architecture
+  - anti-pattern-scan
+
+enforcement:
+  gate: design-review           # workflow S07 / S10
+  accessibility: floor          # never waived below AA
+  anti_patterns: hard-fail
+  waiver: recorded-scoped-user-decision-only

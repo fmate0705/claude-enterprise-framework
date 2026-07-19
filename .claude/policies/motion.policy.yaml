@@ -1,0 +1,70 @@
+# Motion Policy
+# Framework: CEF · Specification: AS-009 (Motion Intelligence Engine) · Version: 0.1.0
+# Canonical motion scale, level-per-project-type, reduced-motion, density,
+# review gates, and skill routing. Single source of truth for motion/motion-scale.md,
+# motion/accessibility.md, motion/review.md. Documentation MUST match these values.
+
+policy: motion
+version: 0.1.0
+
+# Motion levels (motion/motion-scale.md).
+levels:
+  0: no-motion
+  1: essential-feedback
+  2: micro-interactions
+  3: page-transitions
+  4: immersive-experiences
+
+# Default level and ceiling per project type.
+level_by_project_type:
+  landing:            { default: 3, ceiling: 4 }
+  marketing:          { default: 3, ceiling: 4 }
+  corporate:          { default: 2, ceiling: 3 }
+  saas_marketing:     { default: 3, ceiling: 4 }
+  saas_app:           { default: 2, ceiling: 2 }
+  dashboard:          { default: 1, ceiling: 2 }
+  admin:              { default: 1, ceiling: 1 }
+  documentation:      { default: 1, ceiling: 2 }
+  blog:               { default: 2, ceiling: 3 }
+
+reduced_motion:
+  honor_prefers_reduced_motion: required     # floor
+  respect_at_first_render: required
+  non_essential: remove-or-reduce
+  essential_feedback: preserve               # instant/opacity
+  fallback_defined_per_animation: required
+  no_vestibular_triggers: required           # large zoom/spin/parallax
+  max_flashes_per_second: 3
+  long_autoplay_pausable: required           # > 5s must be pausable
+
+density:
+  prefer_minimal_concurrent: required
+  stagger_delay_ms_ref: animation.policy.stagger_delay_ms
+  large_list_motion: minimal-or-disabled
+  offscreen_motion: paused
+
+# Design/motion review gates (motion/review.md).
+review_gates:
+  - purpose
+  - performance
+  - accessibility
+  - consistency
+  - timing
+  - easing
+  - feedback
+  - user-value
+
+# Deterministic skill routing (mirrors rules/tool-engine.md).
+skill_routing:
+  interaction_design: ui-ux-pro-max            # TE-05
+  animation_choreography: emil-motion-skill    # TE-04
+  premium_transitions: emil-frontend-design-skill  # TE-03
+  layout_aware_motion: frontend-design-skill   # TE-02
+  browser_verification: chrome-devtools-mcp    # TE-08
+
+enforcement:
+  gate: design-and-browser-review     # workflow S07 / S10
+  accessibility: floor
+  performance: floor
+  anti_patterns: hard-fail
+  waiver: recorded-scoped-user-decision-only

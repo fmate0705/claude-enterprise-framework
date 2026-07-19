@@ -1,0 +1,112 @@
+# Execution Policy
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+# Canonical execution order, skill invocation, MCP lifecycle, and release gates.
+# Single source of truth for runtime/{workflow-runner,skill-manager,mcp-manager,
+# review-orchestrator,release-manager}.md. Documentation MUST match these values.
+
+policy: execution
+version: 1.0.0
+
+# The execution loop (runtime/workflow-runner.md).
+loop:
+  - understand
+  - plan
+  - build
+  - review
+  - fix
+  - validate
+  - release
+loop_rules:
+  skip_mandatory_phase: forbidden
+  gate_before_advance: required
+  fix_loop_until_gates_pass: required
+  re_run_downstream_after_fix: required
+  delegate_authority: required        # runtime decides no standard
+  update_memory_per_milestone: required
+  surface_blockers: required
+  report_honestly: required
+  resumable_from_memory: required
+
+# Deterministic skill routing (runtime/skill-manager.md); mirrors rules/tool-engine.md.
+skill_routing:
+  visual_hierarchy:        { instrument: taste-skill,                 rule: TE-01 }
+  interface_implementation:{ instrument: frontend-design-skill,       rule: TE-02 }
+  premium_layouts:         { instrument: emil-frontend-design-skill,  rule: TE-03 }
+  motion:                  { instrument: emil-motion-skill,           rule: TE-04 }
+  ux_validation:           { instrument: ui-ux-pro-max,               rule: TE-05 }
+  metadata:                { instrument: seo-skill,                   rule: TE-06 }
+  nextjs_metadata:         { instrument: nextjs-seo-skill,            rule: TE-07 }
+  browser_validation:      { instrument: chrome-devtools-mcp,         rule: TE-08 }
+  imagery:                 { instrument: higgsfield-mcp,              rule: TE-09 }
+  pattern_discovery:       { instrument: [shadcn-ui, magic-ui, aceternity-ui], rule: TE-10 }
+skill_rules:
+  documented_purpose: required
+  invoke_without_purpose: forbidden
+  trigger_not_preference: required
+  read_intent_not_wording: required
+  skip_selection: forbidden
+  capability_scoped: required
+  system_before_generation: required
+  conform_output_to_standards: required
+  output_subject_to_qa: required
+  fallback: tool-engine-TE-12
+
+# MCP lifecycle (runtime/mcp-manager.md).
+mcp_lifecycle:
+  - initialize
+  - authenticate
+  - verify-availability
+  - execute
+  - validate-output
+  - fallback
+  - retry
+  - failure-reporting
+mcp_rules:
+  lifecycle_always: required
+  verify_before_depending: required
+  complete_input_spec: required
+  validate_output_against_standard: required
+  bounded_retries: required
+  indefinite_retry: forbidden
+  fallback_preserves_purpose: required
+  fabricate_on_failure: forbidden
+  silently_skip_verification: forbidden
+  secrets_in_calls_or_logs: forbidden
+  record_substitutions: memory/decisions.md
+mcp_capabilities:
+  chrome-devtools-mcp: [performance, console, network, rendering, accessibility]
+  higgsfield-mcp: [brand-aligned-image-generation]
+
+# Review orchestration (runtime/review-orchestrator.md).
+review:
+  runs: [architecture, design, motion, seo, content, accessibility, performance, security, docker, production]
+  all_gates: policies/quality-gates.policy.yaml     # 14 gates
+  verdict_owner: policies/review.policy.yaml
+  floors_not_applicable: forbidden
+  aggregate_single_report: required
+  exit_with_open_critical_or_major: forbidden
+  record: memory/decisions.md
+
+# Release gates (runtime/release-manager.md). The DECISION is owned by release.policy.
+release_verification:
+  - docker-builds
+  - compose-works
+  - no-placeholder-content
+  - qa-passes
+  - metadata-complete
+  - legal-pages-exist
+  - images-optimized
+  - performance-targets-met
+  - accessibility-targets-met
+  - memory-updated
+  - documentation-updated
+release_rules:
+  evidence_required: required
+  any_failure_blocks: required
+  decision_owner: policies/release.policy.yaml
+  release_on_reject: forbidden
+  tested_rollback_required: required
+  delivery_owner: standards/operations/
+  post_release_verification: required
+  generate_release_summary: required
+  record: [memory/deployment.md, CHANGELOG.md]

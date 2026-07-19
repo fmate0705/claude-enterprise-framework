@@ -1,0 +1,75 @@
+# Capability: SaaS
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+
+capability: saas
+version: 1.0.0
+
+classification:
+  aliases: [saas, software product, subscription product, web product]
+  signals:
+    goal: deliver-a-product-and-convert
+    audience: [public-visitor, authenticated-user]
+    surfaces: marketing-plus-app
+    data: transactional
+    auth: required
+    commerce: subscription
+complexity_default: complex
+
+engines:
+  required:
+    - architecture
+    - platform
+    - components
+    - experience
+    - motion
+    - discoverability
+    - content
+    - assets
+    - quality
+    - operations
+  excluded: []                  # dual surface needs every engine
+
+skills: [taste-skill, frontend-design-skill, emil-frontend-design-skill, emil-motion-skill, ui-ux-pro-max, seo-skill, nextjs-seo-skill]
+mcps: [chrome-devtools-mcp, higgsfield-mcp]
+
+legal_documents:
+  - privacy-policy
+  - terms-of-service
+  - cookie-policy
+  - imprint
+  - accessibility-statement
+  hungarian_when_applicable: [aszf, adatkezelesi-tajekoztato, impresszum, cookie-tajekoztato]
+
+assets:
+  - logo-system
+  - og-image
+  - favicon-set
+  optional: [hero-image, product-renders, illustrations, social-assets]
+
+workflow:
+  project_type: PT-F            # workflow-engine/project-types.md
+  states: all
+  emphasis: [S08, S14, S15]     # architecture, security, deployment
+  deltas: [marketing-and-app-route-groups, auth, onboarding, billing, pricing-seo]
+
+profiles:
+  architecture: saas            # standards/architecture/project-types.md
+  density:                      # experience.policy.yaml — dual surface
+    marketing: spacious
+    app: dense
+  motion_level:                 # motion.policy.yaml
+    marketing: saas_marketing   # default 3, ceiling 4
+    app: saas_app               # default 2, ceiling 2
+  page_sections: saas_home      # content.policy.yaml
+
+# Applied when classified as multi-tenant-application (runtime.policy delta).
+deltas:
+  multi-tenant:
+    adds: [tenant-isolation, per-tenant-data-boundary, tenant-admin]
+    complexity: enterprise
+    emphasis: [security, architecture]
+
+validation:
+  gates: all
+  emphasis: [security, architecture, performance, accessibility]
+  release_verification: all

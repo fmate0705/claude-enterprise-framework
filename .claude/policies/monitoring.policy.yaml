@@ -1,0 +1,80 @@
+# Monitoring Policy
+# Framework: CEF · Specification: AS-014 (Delivery & Operations Engine) · Version: 0.1.0
+# Canonical monitoring targets, alert thresholds, and logging retention. Single source
+# of truth for operations/{monitoring,logging,observability,analytics}.md.
+# Core Web Vitals thresholds are owned by discoverability.policy.yaml and referenced.
+# Documentation MUST match these values.
+
+policy: monitoring
+version: 0.1.0
+
+required_before_production: true
+
+scope:
+  - application        # error rate, request rate, latency, saturation
+  - infrastructure     # cpu, memory, disk, restarts, host health
+  - performance        # p50/p95/p99, field Core Web Vitals
+  - availability       # external uptime probes
+  - errors             # exceptions with release + correlation context
+  - business-metrics   # the project's key success metric
+
+targets:
+  availability_percent_min: 99.9
+  response_time_p95_ms_max: 500
+  error_rate_percent_max: 1
+
+alerts:
+  error_rate:
+    condition: "> 1% sustained"
+    window_minutes: 5
+  latency_p95:
+    condition: "> 500ms sustained"
+    window_minutes: 5
+  availability:
+    condition: "health check failing"
+    consecutive_probes: 2
+  certificate_expiry:
+    condition: "< 14 days remaining"    # canonical in security.policy
+alert_rules:
+  actionable: required
+  owned: required
+  delivery_tested: required
+  noisy_or_duplicate: forbidden
+  severity_routing: operations.policy.yaml   # SEV1..SEV4
+
+availability_check:
+  external: required                    # probe from outside the infrastructure
+  endpoint: /health/ready               # canonical in operations.policy
+
+logging:
+  format: structured-json
+  required_fields: [timestamp, level, message, service, environment, version, requestId]
+  levels: [error, warn, info, debug, trace]
+  debug_in_production: forbidden
+  sink: stdout-stderr
+  centralized: required
+  retention_days: 30
+  redact: [secrets, credentials, tokens, pii]
+  sample_errors_away: forbidden
+
+observability:
+  signals: [metrics, logs, traces]
+  correlated_ids: required
+  dashboards: required
+  annotate_deploys: required
+  service_and_dependency_health_visible: required
+  vendor_neutral_instrumentation: recommended   # e.g., OpenTelemetry
+  unbounded_metric_cardinality: forbidden
+  pii_in_telemetry: forbidden
+
+analytics:
+  lawful_basis_and_disclosure: required
+  consent_before_non_essential: required
+  privacy_first_defaults: required
+  pii_in_events: forbidden-without-basis
+  performance_safe: required            # deferred; within budget
+  documented_event_schema: required
+
+references:
+  core_web_vitals: discoverability.policy.yaml
+  performance_budget: platform/performance.md

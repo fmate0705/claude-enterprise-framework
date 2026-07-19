@@ -1,0 +1,41 @@
+# Design Policy
+# Framework: CEF · Specification: AS-008 (Experience Engine) · Version: 0.1.0
+# Canonical color and visual-effect values. Single source of truth for
+# experience/colors.md (and referenced by accessibility.md). Docs MUST match.
+
+policy: design
+version: 0.1.0
+
+palette:
+  primary: 1
+  accents_max: 2
+  neutral_scale: required
+  semantic: [success, warning, error, info]
+
+contrast_ratio:                 # WCAG 2.2 AA
+  body_text: 4.5
+  large_text_and_ui: 3.0
+
+color_rules:
+  token_only: required
+  color_not_sole_signal: required
+  decorative_gradients: forbidden
+  accent_on_action_only: required
+  pure_black_on_white: forbidden
+  timeless_palette: required
+
+theming:
+  token_theming: required
+  verify_both_themes: required
+  dark_elevation_lighter_surfaces: required
+  respect_prefers_color_scheme: required
+
+visual_effects:
+  excessive_glassmorphism: forbidden
+  neon_glow_overuse: forbidden
+  neumorphism: discouraged
+  elevation_via_tokens: required
+
+focus:
+  visible_focus_indicator: required
+  remove_focus_outline: forbidden

@@ -1,0 +1,127 @@
+# AI Evaluation Policy
+# Framework: CEF · Specification: AS-019 (AI Intelligence Platform Engine) · Version: 2.0.0
+# Canonical source of truth for AI evaluation: datasets, acceptance criteria, regression,
+# scoring, hallucination measurement, consistency, and the thresholds that gate release.
+#
+# SCOPE. Evaluation of AI capabilities in PRODUCTS BUILT WITH CEF.
+# Boundaries. The QA gate model, severity, and scoring -> qa.policy / quality-gates.policy
+# (AS-013). Behavior-test discipline -> engineering-engine.md (E-099..E-104).
+# Latency and cost targets -> ai.policy. This file sets AI-specific thresholds only.
+# Documentation MUST match these values.
+
+policy: ai-evaluation
+version: 2.0.0
+
+# --- You cannot ship what you cannot measure. AI is not exempt from this.
+principles:
+  evaluation_required_before_release: required
+  unevaluated_ai_in_production: forbidden
+  vibes_as_evaluation: forbidden
+  demo_as_evidence: forbidden
+  evaluation_precedes_prompt_tuning: required
+  reliable_before_impressive: required
+
+datasets:
+  benchmark_set_exists: required
+  set_represents_real_usage: required
+  set_built_from_real_inputs: preferred
+  synthetic_only_set: discouraged
+  set_versioned: required
+  set_owner_named: required
+  size_justified: required
+  set_covers: [happy-path, edge-cases, adversarial, out-of-scope, ambiguous, empty]
+  adversarial_cases_include_injection: required
+  test_set_leaks_into_prompt_examples: forbidden
+  set_reviewed_by_a_domain_expert: required
+
+acceptance:
+  criteria_defined_per_capability: required
+  criteria_defined_before_building: required
+  criteria_measurable: required
+  criteria_recorded: required                # memory/decisions.md
+  threshold_set_deliberately: required
+  threshold_lowered_to_pass: forbidden
+  threshold_change_recorded: required
+
+# --- Scoring. State the method; every method has a known weakness.
+scoring:
+  method_documented: required
+  methods: [exact-match, structural-match, human-rating, rubric-graded, programmatic-check]
+  method_matches_the_task: required
+  exact_match_on_free_text: discouraged
+  rubric_criteria_independently_gradeable: required
+  model_as_judge_permitted: allowed
+  model_as_judge_limitations_recorded: required   # correlated blind spots with the generator
+  model_as_judge_calibrated_against_humans: required
+  model_grades_its_own_output: forbidden          # safety.policy.hallucination
+  human_rating_uses_a_written_rubric: required
+  inter_rater_agreement_measured: recommended
+
+metrics:
+  defined_per_capability: required
+  definition_stable: required
+  redefinition_versioned: required
+  core: [task-success, groundedness, hallucination-rate, refusal-correctness, consistency, latency, cost]
+  retrieval: [recall, precision, mrr]             # rag.policy.quality
+  agent: [completion-rate, steps-to-completion, tool-error-rate, escalation-rate, cost-per-task]
+  safety: [injection-resistance, unsafe-output-rate, leak-rate]
+  metric_without_a_definition: forbidden
+  fabricated_metric: forbidden                    # Article IV
+
+hallucination_measurement:
+  measured_not_assumed: required
+  measured_against_grounding: required
+  fabricated_citation_counted: required
+  unsupported_claim_counted: required
+  target_recorded: required
+  zero_hallucination_claimed: forbidden           # not a defensible claim
+  measurement_covers_refusal_correctness: required   # over-refusal is also a failure
+
+consistency:
+  non_determinism_expected: required
+  same_input_run_multiple_times: required
+  variance_measured: required
+  variance_bounded_per_capability: required
+  determinism_assumed: forbidden
+  a_single_passing_run_as_evidence: forbidden
+
+regression:
+  regression_set_exists: required
+  every_failure_becomes_a_case: required
+  run_before_every_release: required
+  run_on_prompt_change: required                  # prompt.policy.versioning
+  run_on_model_change: required                   # ai.policy.model_selection
+  run_on_retrieval_change: required
+  regression_blocks_release: required
+  regression_waived_silently: forbidden
+
+# --- What blocks a release.
+gates:
+  acceptance_criteria_met: required
+  regression_clean: required
+  hallucination_within_target: required
+  safety_cases_pass: required
+  injection_cases_pass: required
+  latency_within_target: required                 # ai.policy.latency
+  cost_within_budget: required                    # ai.policy.cost
+  human_review_sampled: required
+  gate: ai-review
+  failure_blocks: required
+
+production:
+  live_quality_monitored: required
+  drift_detected: required
+  drift_alerts: required
+  user_feedback_captured: recommended
+  feedback_feeds_the_regression_set: required
+  incidents_become_cases: required
+  offline_evaluation_treated_as_sufficient: forbidden
+
+honesty:
+  results_reported_faithfully: required           # Article XI
+  failure_reported_with_evidence: required
+  cherry_picked_examples_as_results: forbidden
+  evaluation_on_the_training_examples: forbidden
+  claiming_accuracy_without_a_set: forbidden
+
+anti_patterns: hard-fail

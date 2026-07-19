@@ -1,0 +1,119 @@
+# Authentication Policy
+# Framework: CEF · Specification: AS-016 (Security & Compliance Engine) · Version: 2.0.0
+# Canonical source of truth for credentials, sessions, tokens, MFA, and recovery.
+# Absorbed from AS-014 operational-security@0.1.0 (sessions, cookies), which no longer
+# carries these values.
+# Consumed by: standards/security/{authentication,session-management,password-policy,
+# multi-factor-authentication}.md, checklists/security.md.
+# Documentation MUST match these values.
+
+policy: authentication
+version: 2.0.0
+
+# --- Passwords. Length is the dominant factor; composition rules are counterproductive.
+password:
+  min_length: 12
+  max_length_min_supported: 64      # truncation below this is forbidden
+  composition_rules: forbidden       # no forced upper/lower/digit/symbol mix
+  breach_check_against_known_corpus: required
+  denylist_common_and_contextual: required
+  periodic_forced_rotation: forbidden-without-evidence-of-compromise
+  rotation_on_compromise: required
+  hashing_algorithm: memory-hard     # argon2id preferred; bcrypt/scrypt acceptable
+  per_password_salt: required
+  peppering: optional
+  plaintext_storage: forbidden
+  reversible_encryption_storage: forbidden
+  fast_general_purpose_hash: forbidden   # md5/sha1/sha256-alone
+  all_unicode_and_spaces_accepted: required
+  paste_and_password_manager: allowed    # blocking either is forbidden
+  reveal_toggle: recommended
+
+authentication_methods:
+  # No provider is mandated. Trade-offs are documented in security/authentication.md.
+  supported: [passwordless-email-link, passkeys-webauthn, email-password, oauth2, oidc]
+  preferred_for_new_projects: passkeys-webauthn-or-passwordless
+  server_side_verification: required
+  client_asserted_identity: forbidden
+
+session:
+  server_validated: required
+  identifier_entropy_bits_min: 128
+  regenerate_on_privilege_change: required   # login, elevation, role change
+  fixation_defense: required
+  idle_timeout_minutes_default: 30
+  absolute_timeout_hours_default: 12
+  idle_timeout_minutes_sensitive: 15
+  expiry: required
+  invalidate_on_logout_or_credential_change: required
+  invalidate_all_sessions_on_password_reset: required
+  server_side_revocation: required
+  client_trusted_session: forbidden
+  concurrent_session_visibility: recommended
+
+cookies:
+  Secure: required
+  HttpOnly: required-unless-js-needed
+  SameSite: required                 # Lax minimum; Strict for sensitive actions
+  session_readable_by_script: forbidden
+  __Host_prefix_for_session: preferred
+  persistent_session_cookie: discouraged
+  scope_narrowest_path_and_domain: required
+
+tokens:
+  access_token_lifetime_minutes_max: 15
+  refresh_token_lifetime_days_max: 30
+  refresh_token_rotation: required
+  refresh_token_reuse_detection: required
+  revocation_supported: required
+  storage_in_localstorage: forbidden      # XSS-exfiltratable
+  storage_preferred: httponly-cookie-or-memory
+  signature_verified: required
+  algorithm_none: forbidden
+  algorithm_confusion_defense: required
+  audience_and_issuer_validated: required
+  expiry_validated: required
+
+mfa:
+  offered: required
+  enforced_for_privileged_accounts: required
+  enforced_for_admin: required
+  preferred_factors: [passkeys-webauthn, totp]
+  sms_as_primary_factor: discouraged      # SIM-swap and interception exposure
+  email_as_sole_second_factor: discouraged
+  recovery_codes: required
+  recovery_codes_single_use: required
+  rate_limited: required
+  remember_device_max_days: 30
+  bypass_without_recorded_decision: forbidden
+
+account_recovery:
+  # Recovery is an authentication path and is held to the same bar.
+  single_use_token: required
+  token_expiry_minutes_max: 60
+  token_invalidated_on_use: required
+  rate_limited: required
+  user_enumeration_via_response: forbidden
+  user_enumeration_via_timing: forbidden
+  new_password_meets_password_policy: required
+  notify_user_on_recovery: required
+  security_questions: forbidden           # low-entropy, widely known answers
+
+brute_force_defense:
+  rate_limiting: required                 # canonical in security.policy.rate_limiting
+  progressive_delay_or_lockout: required
+  lockout_notifies_user: required
+  generic_failure_message: required       # never reveal which factor failed
+  credential_stuffing_defense: required
+  failed_attempts_logged: required
+
+privileged_access:
+  reauthentication_for_sensitive_actions: required
+  step_up_authentication: required
+  admin_session_timeout_minutes_max: 15
+
+ux:
+  # Authentication UX is reviewed with UI/UX Pro Max (TE-05).
+  review_skill: ui-ux-pro-max
+  accessible_error_messaging: required    # a11y floor applies
+  dark_patterns: forbidden

@@ -1,0 +1,59 @@
+# Interaction Policy
+# Framework: CEF · Specification: AS-009 (Motion Intelligence Engine) · Version: 0.1.0
+# Canonical interaction behaviors (hover, feedback, micro-interaction mapping,
+# gesture). Duration numbers are owned by animation.policy; this file references
+# bands by name. Single source for motion/hover.md, feedback.md, gesture.md.
+# Documentation MUST match these values.
+
+policy: interaction
+version: 0.1.0
+
+hover:
+  applies: fine-pointer-only          # @media (hover:hover) and (pointer:fine)
+  duration_band: fast_feedback        # see animation.policy.durations_ms
+  not_sole_affordance: required        # nothing essential hover-only
+  has_focus_equivalent: required
+  no_layout_shift: required
+  tooltip_delay: required
+
+feedback:
+  start_max_ms_ref: animation.policy.feedback_start_max_ms   # canonical 100
+  color_not_sole_signal: required
+  at_source: required
+  announce_async_changes: required     # aria-live
+  prevent_double_submit: required
+  reduced_motion_perceivable: required
+
+# Micro-interaction mapping: component -> duration band (animation.policy).
+micro_interactions:
+  button: fast_feedback
+  input: fast_feedback
+  checkbox: ui_transition
+  switch: ui_transition
+  radio: ui_transition
+  dropdown: ui_transition
+  tabs: ui_transition
+  accordion: ui_transition
+  card_hover: fast_feedback
+  tooltip: fast_feedback
+  toast: ui_transition
+  badge: ui_transition
+  modal: panel_transition
+  drawer: panel_transition
+  menu: ui_transition
+rules_micro:
+  immediate_feedback: required
+  subtle_default: required
+  consistent_per_component: required
+  non_blocking: required
+  reduced_motion_fallback: required
+
+gesture:
+  non_gesture_equivalent: required
+  natural_1to1_following: required
+  clear_commit_threshold: required
+  standard_gestures_preferred: required
+  no_scroll_hijack: required
+  continuous_feedback: required
+  keyboard_and_at_operable: required
+  performant_60fps: required           # see animation.policy.performance.target_fps

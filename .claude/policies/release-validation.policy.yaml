@@ -1,0 +1,66 @@
+# Release Validation Policy
+# Framework: CEF · Specification: AS-020 (Validation & Automation Engine) · Version: 2.0.0
+# The automated pre-release validation suite — composition, blocking, and the evidence it
+# produces for AS-013's Gate 14.
+#
+# SCOPE. The release DECISION — production-readiness criteria, the approve/reject recommendation,
+# score thresholds, and sign-off — is owned by release.policy (AS-013) and is NOT restated here.
+# This policy owns only the automated suite that produces the evidence. Documentation MUST match.
+
+policy: release-validation
+version: 2.0.0
+review_ref: validation.policy.yaml
+defers_to: [release.policy, quality-gates.policy, deployment.policy]   # AS-013 decides; M-DEPLOY mechanics
+
+# --- The automated suite (RLV-03). Runs in full on a release candidate.
+suite:
+  - build_validation          # BLD — types, lint, format, build, bundle
+  - unit
+  - integration
+  - e2e_full                  # all critical journeys, all engines
+  - cross_browser
+  - cross_platform
+  - visual_regression
+  - accessibility             # floor
+  - performance               # floor
+  - lighthouse
+  - seo
+  - ai_discoverability
+  - schema
+  - structured_data
+  - api
+  - forms
+  - security                  # floor
+  - docker                    # reproducible image + health
+runs_on: release-candidate    # AUT-08
+produces: release-evidence-artifact   # RLV-07 — per-criterion pass/fail
+
+# --- Evidence contract (RLV-04, RLV-07, RLV-08).
+evidence:
+  per_criterion_result_required: required   # RLV-07 — not a single opaque verdict
+  maps_to_definition_of_done: required      # RLV-04 — every automatable DoD condition
+  maps_to: release.policy.yaml              # production_readiness criteria (AS-013)
+  missing_evidence_is_fail: required        # RLV-08 / VAP-109
+  durable_artifact: required                # RPT-01
+
+# --- Blocking (RLV-05, RLV-06). Floors block unconditionally.
+blocking:
+  floor_failure_blocks_unconditionally: required   # RLV-05 / OVR-03
+  floors: [accessibility, security, performance, legal]
+  failed_critical_journey_blocks: required         # RLV-06 / E2E-11
+  failed_build_or_image_blocks: required           # RLV-06 / DKT-11
+  score_overrides_floor: forbidden                 # VAP-108
+
+# --- Decision boundary (RLV-09, RLV-10) — owned by AS-013.
+decision:
+  computed_by: release.policy.yaml         # release_recommendation — approve/reject
+  recommendation_overridden_here: forbidden   # RLV-09
+  sign_off: release.policy.yaml            # Gate 14, Product Strategist (RLV-10)
+  automation_self_approves: forbidden      # OVR-04
+
+# --- Post-release (RLV-12…RLV-15).
+post_release:
+  smoke_deployed_target: required          # RLV-12
+  health_verified: required                # RLV-13 (monitoring = M-DEPLOY)
+  rollback_validated: required             # RLV-14
+  release_recorded: release.policy.yaml    # record_release: memory/deployment.md, CHANGELOG.md

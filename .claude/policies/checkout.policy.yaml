@@ -1,0 +1,101 @@
+# Checkout Policy
+# Framework: CEF · Specification: AS-017 (Commerce Platform Engine) · Version: 2.0.0
+# Canonical source of truth for the checkout flow, its steps, and its friction rules.
+#
+# Boundaries. CTA hierarchy, section ordering, and anti-manipulation rules are owned by
+# conversion.policy.yaml (AS-008). Form field, label, and error rules are owned by the
+# Component and Experience Engines (D-072..D-081). Authentication is owned by M-SEC
+# (authentication.policy.yaml). Money and totals are owned by pricing.policy.yaml.
+# Consumed by: standards/commerce/{cart,checkout,guest-checkout,customer-accounts}.md.
+# Documentation MUST match these values.
+
+policy: checkout
+version: 2.0.0
+
+# --- The deterministic flow. Same order, every project.
+flow:
+  steps: [cart, customer, shipping, billing, payment, confirmation]
+  post_purchase: [order-creation, fulfillment, notifications]
+  order_fixed: required
+  steps_skippable_when_not_applicable: required   # digital-only skips shipping
+  step_skipped_silently_when_required: forbidden
+
+step_rules:
+  current_step_indicated: required
+  total_steps_known: required
+  back_navigation_preserves_data: required
+  forward_without_completing_required_fields: forbidden
+  progress_survives_refresh: required
+  progress_survives_session_resume: required
+
+friction:
+  principle: fewest-practical-steps
+  forced_account_creation: forbidden      # guest checkout is required
+  guest_checkout: required
+  account_offered_after_purchase: preferred
+  unnecessary_field: forbidden
+  field_justified_individually: required  # privacy.policy.collection
+  optional_by_default: required
+  address_autocomplete: recommended
+  saved_details_for_returning_customers: recommended
+
+cart:
+  persists_across_session: required
+  persists_for_authenticated_customer: required
+  merge_guest_cart_on_login: required
+  quantity_editable: required
+  removal_available: required
+  empty_state_present: required           # D-083
+  price_recalculated_server_side: required
+  stock_revalidated_at_checkout: required
+  totals_itemized: required
+
+totals:
+  itemized_before_payment: required       # subtotal, shipping, tax, discount, total
+  final_total_before_payment_ref: pricing.policy.total_transparency
+  currency_shown: required
+
+payment_step:
+  total_immutable_after_confirmation: required
+  double_submit_prevented: required       # D-057
+  idempotency_key: required               # payments.policy.idempotency
+  loading_state_during_authorization: required
+  duplicate_order_on_retry: forbidden
+  back_button_after_payment_safe: required
+
+confirmation:
+  shown_immediately: required
+  order_reference_displayed: required
+  confirmation_email_sent: required       # commerce.policy.emails
+  confirmation_reachable_later: required
+  confirmation_depends_only_on_email: forbidden
+  order_created_before_confirmation_shown: required
+
+failure:
+  failure_reason_actionable: required
+  cart_preserved_on_failure: required     # D-081
+  input_preserved_on_failure: required
+  retry_available_ref: payments.policy.failures.retry_available   # canonical there
+  charge_without_order: forbidden
+  order_without_charge: forbidden
+
+integrity:
+  price_validated_server_side: required
+  stock_validated_server_side: required
+  discount_validated_server_side_ref: pricing.policy.discounts.discount_validated_server_side   # canonical there
+  shipping_validated_server_side: required
+  any_client_supplied_total_trusted: forbidden
+
+floors:
+  accessibility: floor                    # WCAG 2.2 AA; checkout is never exempt
+  performance: floor
+  security: floor
+  keyboard_operable: required
+  errors_announced: required              # E-118
+  timeout_warning_before_expiry: required
+
+review:
+  gate: commerce-review
+  browser_verification: chrome-devtools-mcp   # TE-08
+  ux_validation: emil-frontend-design-skill   # TE-03
+  anti_patterns: hard-fail

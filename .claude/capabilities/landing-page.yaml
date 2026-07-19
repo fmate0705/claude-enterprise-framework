@@ -1,0 +1,63 @@
+# Capability: Landing Page
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+# Values owned by other engines are referenced, never restated (RVL-14).
+
+capability: landing-page
+version: 1.0.0
+
+classification:
+  aliases: [landing page, lander, campaign page, squeeze page]
+  signals:
+    goal: convert
+    audience: public-visitor
+    surfaces: one-primary
+    data: none
+    auth: none
+    commerce: none
+complexity_default: standard
+
+engines:
+  required:
+    - architecture
+    - platform
+    - components
+    - experience
+    - motion
+    - discoverability
+    - content
+    - assets
+    - quality
+    - operations
+  excluded: []          # a public conversion page needs every domain engine
+
+skills: [taste-skill, frontend-design-skill, emil-frontend-design-skill, emil-motion-skill, ui-ux-pro-max, seo-skill, nextjs-seo-skill]
+mcps: [chrome-devtools-mcp, higgsfield-mcp]
+
+legal_documents:        # content/legal-pages.md; hungarian set when applicable
+  - privacy-policy
+  - cookie-policy
+  - imprint
+  optional: [terms-of-service]
+
+assets:                 # standards/assets/
+  - logo-system
+  - og-image
+  - favicon-set
+  - hero-image
+  optional: [social-assets]
+
+workflow:
+  project_type: PT-A            # workflow-engine/project-types.md
+  states: all
+  emphasis: [S05, S07, S12, S13]
+
+profiles:                       # referenced from the owning engines
+  architecture: landing-page    # standards/architecture/project-types.md
+  density: spacious             # experience.policy.yaml
+  motion_level: landing         # motion.policy.yaml (default 3, ceiling 4)
+  page_sections: landing        # content.policy.yaml required_page_sections
+
+validation:
+  gates: all                    # quality-gates.policy.yaml
+  emphasis: [experience, discoverability, performance, accessibility]
+  release_verification: all     # execution.policy.yaml

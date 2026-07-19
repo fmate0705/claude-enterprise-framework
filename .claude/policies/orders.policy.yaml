@@ -1,0 +1,97 @@
+# Orders Policy
+# Framework: CEF · Specification: AS-017 (Commerce Platform Engine) · Version: 2.0.0
+# Canonical source of truth for the order lifecycle: states, transitions, immutability,
+# and the order record.
+#
+# Boundaries. Payment mechanics are owned by payments.policy.yaml; money by
+# pricing.policy.yaml; audit logging by M-SEC (audit-logging.md). Runtime/session state
+# machines are unrelated (runtime/state-machine.md).
+# Consumed by: standards/commerce/{orders,returns,refunds,fulfillment}.md.
+# Documentation MUST match these values.
+
+policy: orders
+version: 2.0.0
+
+record:
+  immutable_after_creation: required     # an order is a record of what happened
+  mutate_historical_order: forbidden
+  corrections_by_new_record: required    # refund/credit, never edit
+  price_snapshot_retained: required      # pricing.policy.price
+  tax_snapshot_retained: required
+  address_snapshot_retained: required
+  product_snapshot_retained: required    # catalog changes never rewrite history
+  reference_human_readable: required
+  reference_unguessable: required        # non-sequential; AZ-15 still applies
+  reference_stable: required
+
+creation:
+  created_only_after_payment_confirmed: required   # payments.policy.fulfilment_trigger
+  created_exactly_once_per_intent: required
+  idempotent: required
+  duplicate_order: forbidden
+  order_without_payment_record: forbidden
+
+# --- States. Exactly these; no project invents its own.
+states:
+  - pending      # created, awaiting payment confirmation
+  - paid         # payment confirmed
+  - processing   # being prepared
+  - shipped      # handed to carrier (physical)
+  - delivered    # received by customer (physical)
+  - completed    # terminal success
+  - cancelled    # terminal, before fulfilment
+  - refunded     # terminal, value returned
+  - disputed     # chargeback raised
+
+terminal_states: [completed, cancelled, refunded]
+
+# --- Transitions. Any transition not listed is forbidden.
+transitions:
+  pending:    [paid, cancelled]
+  paid:       [processing, cancelled, refunded, disputed]
+  processing: [shipped, completed, cancelled, refunded, disputed]
+  shipped:    [delivered, refunded, disputed]
+  delivered:  [completed, refunded, disputed]
+  completed:  [refunded, disputed]
+  cancelled:  []
+  refunded:   [disputed]
+  disputed:   [refunded, completed]
+
+transition_rules:
+  undeclared_transition: forbidden
+  skipping_states_silently: forbidden
+  digital_orders_skip: [shipped, delivered]    # no carrier; paid -> processing -> completed
+  backwards_transition: forbidden              # forward-only, except dispute resolution
+  every_transition_logged: required            # AL-02
+  every_transition_attributed: required        # actor recorded
+  transition_reason_recorded_when_exceptional: required
+  customer_notified_on_meaningful_change: required   # commerce.policy.emails
+  automatic_transition_documented: required
+
+cancellation:
+  allowed_before_fulfilment: required
+  after_shipment_is_a_return: required         # not a cancellation
+  refund_issued_on_cancellation_of_paid_order: required
+  stock_released_on_cancellation_ref: commerce.policy.inventory.stock_released_on_cancellation   # canonical there
+
+disputes:
+  dispute_recorded_immediately: required
+  evidence_retained: required
+  dispute_alerted: required
+  dispute_rate_monitored: required
+  silent_dispute_handling: forbidden
+
+visibility:
+  status_visible_to_customer: required
+  status_language_plain: required              # never internal enum names
+  history_available_to_customer: required
+  authorized_per_order: required               # AZ-12; order ID is not entitlement
+
+integrity:
+  state_authoritative_server_side: required
+  client_asserted_state: forbidden
+  concurrent_transition_guarded: required      # optimistic locking or equivalent
+
+review:
+  gate: commerce-review
+  anti_patterns: hard-fail

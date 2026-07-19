@@ -1,0 +1,76 @@
+# Content Policy
+# Framework: CEF · Specification: AS-011 (Content Intelligence Engine) · Version: 0.1.0
+# Canonical reading level, readability limits, heading hierarchy, CTA rules,
+# required page sections, legal-page requirements, and review gates. Single source
+# of truth for content/{copywriting,headlines,page-structure,legal-pages,review}.md.
+# Documentation MUST match these values.
+
+policy: content
+version: 0.1.0
+
+readability:
+  reading_grade_target: 8          # aim for grade 8 plain language
+  reading_grade_max: 12            # technical/legal content exempt where necessary
+  sentence_avg_words_max: 20
+  sentence_hard_max_words: 30
+  paragraph_max_sentences: 4
+  scannable: required              # headings, short paragraphs, lists
+  no_placeholder: required
+  no_fabrication: required
+
+heading_hierarchy:
+  h1_per_page: 1
+  sequential_levels: required
+  descriptive_headings: required
+  headings_for_styling: forbidden
+
+cta:
+  primary_per_view: 1
+  verb_led: required
+  value_clear: required
+  generic_labels: forbidden        # "submit"/"click here"
+  dark_patterns: forbidden
+
+# Required sections per page type (content/page-structure.md).
+required_page_sections:
+  landing: [hero, social-proof, benefits, how-it-works, proof, faq, final-cta]
+  corporate_home: [hero, what-we-do, offerings, proof, about, contact]
+  agency_home: [hero, services, work, process, proof, contact]
+  saas_home: [hero, value, features, how-it-works, proof, pricing, faq, cta]
+  portfolio: [hero, work, about, contact]
+  blog_article: [title, intro, body, conclusion, author, related]
+  documentation: [title, overview, steps, examples, related]
+  pricing: [plans, inclusions, recommended, faq, cta]
+  about: [story, values, team, proof, contact]
+  service: [what, who, benefits, process, proof, cta]
+  contact: [intro, methods, form, location]
+  faq: [grouped-questions]
+  case_study: [context, problem, solution, results, cta]
+
+legal_pages:
+  baseline: [privacy-policy, terms-of-service, cookie-policy, accessibility-statement, imprint]
+  hungarian: [aszf, adatkezelesi-tajekoztato, impresszum, cookie-tajekoztato]
+  mandatory_disclaimer: required     # "not legal advice; requires qualified review"
+  fabricated_details: forbidden
+  presence_when_applicable: required
+
+# Content review gates (content/review.md).
+review_gates:
+  - accuracy
+  - grammar
+  - readability
+  - brand-voice
+  - tone-consistency
+  - accessibility
+  - seo-alignment
+  - conversion-clarity
+  - localization
+  - legal-requirements
+
+enforcement:
+  gate: content-review
+  accuracy: hard-gate
+  legal: hard-gate
+  fabrication: hard-fail
+  anti_patterns: hard-fail
+  waiver: recorded-scoped-user-decision-only

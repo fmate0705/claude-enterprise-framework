@@ -1,0 +1,58 @@
+# Context Policy
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+# Canonical context-loading rules. Single source of truth for runtime/context-manager.md.
+# Implements Constitution Article IX and the Knowledge Engine's loading law.
+# Documentation MUST match these values.
+
+policy: context
+version: 1.0.0
+
+law: "Load the priority-ordered transitive closure of what the task requires, and nothing else."
+law_owner: knowledge/loading.md
+
+load_order:
+  - memory              # resume, do not rediscover
+  - kernel              # constitution, rules
+  - workflow-knowledge  # resolve state and closure
+  - capability-profile  # bound the engine set
+  - domain-engines      # only those required, in dependency order
+  - qa-and-checklists   # at review
+  - operations          # at delivery
+
+scoping:
+  capability_scoped: required     # excluded engines never enter context
+  task_scoped: required           # knowledge/routing.md per task
+  phase_scoped: required          # context follows the phase
+  whole_framework_in_context: forbidden
+
+unloading:
+  unload_inactive_modules: required
+  retain_just_in_case: forbidden
+  reload_on_scope_change: required
+  carry_stale_context_forward: forbidden
+
+preference_order:                 # cheapest sufficient source wins
+  - memory                        # a recorded decision answers it
+  - policies                      # a policy owns the value
+  - rules                         # the rule encodes the decision
+  - standards                     # full specification, only when authoring/deep-applying
+rules_preference:
+  summaries_over_specifications: required
+  rules_before_standards: required
+  policies_over_prose: required
+  reread_prose_for_a_policy_value: forbidden
+  re_derive_recorded_decision: forbidden
+
+hard_limits:
+  skip_phase_for_economy: forbidden
+  skip_gate_for_economy: forbidden
+  skip_checklist_for_economy: forbidden
+  skip_memory_update_for_economy: forbidden
+  floors_always_in_scope: required   # a11y, security, performance, legal
+
+references:
+  loading_law: knowledge/loading.md
+  routing: knowledge/routing.md
+  closure: knowledge/dependencies.md
+  token_economy: CLAUDE.md            # Constitution Article IX
+  token_standard: standards/token-optimization.md

@@ -1,0 +1,60 @@
+# Capability: Dashboard
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+
+capability: dashboard
+version: 1.0.0
+
+classification:
+  aliases: [dashboard, analytics dashboard, data dashboard, product dashboard]
+  signals:
+    goal: operate-and-complete-tasks
+    audience: authenticated-user
+    surfaces: application-shell
+    data: transactional
+    auth: required
+    commerce: none
+complexity_default: complex
+
+engines:
+  required:
+    - architecture
+    - platform
+    - components
+    - experience
+    - motion
+    - content
+    - quality
+    - operations
+  excluded:
+    - engine: discoverability
+      reason: "The app is intentionally noindex and auth-gated; there is no public discovery surface. Robots state is still set explicitly by the Platform/Operations engines."
+    - engine: assets
+      reason: "No brand-asset production surface; the app consumes the existing identity rather than producing assets."
+
+skills: [taste-skill, frontend-design-skill, ui-ux-pro-max]
+mcps: [chrome-devtools-mcp]
+
+legal_documents:                # internal/auth-gated; policies still apply to data handling
+  - privacy-policy
+  optional: [terms-of-service]
+
+assets: []                      # consumes the existing identity; produces none
+
+workflow:
+  project_type: PT-E            # workflow-engine/project-types.md
+  states: all
+  emphasis: [S06, S07, S13, S14]   # UX, dense UI, performance, security
+  deltas: [auth, role-model, data-layer, virtualization]
+  relaxed: [S12]                # SEO review reduced to explicit noindex verification
+
+profiles:
+  architecture: dashboard       # standards/architecture/project-types.md
+  density: dense                # experience.policy.yaml
+  motion_level: dashboard       # motion.policy.yaml (default 1, ceiling 2)
+  page_sections: none           # app surface; microcopy per content/ux-writing.md
+
+validation:
+  gates: all-applicable         # discoverability gate marked not-applicable with reason
+  floors_not_applicable: forbidden   # a11y/security/performance always apply
+  emphasis: [accessibility, performance, security]
+  release_verification: all

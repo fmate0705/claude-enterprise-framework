@@ -1,0 +1,72 @@
+# Review Policy
+# Framework: CEF · Specification: AS-013 (Quality Assurance Engine) · Version: 0.1.0
+# Canonical severity model and scoring methodology. Single source of truth for
+# standards/quality/review-workflow.md. Documentation MUST match these values.
+
+policy: review
+version: 0.1.0
+
+# Every finding must declare these fields.
+finding_contract:
+  - severity
+  - reason
+  - recommendation
+  - owner
+
+severity_levels: [critical, major, minor, informational]
+
+severity:
+  critical:
+    definition: violates-a-floor-or-correctness-or-exposes-data
+    allowed_at_gate: 0
+    allowed_at_release: 0
+    waivable: recorded-scoped-user-decision-only   # never below law
+  major:
+    definition: violates-a-standard-with-material-impact
+    allowed_at_gate: 0
+    allowed_at_release: 0
+  minor:
+    definition: violates-a-standard-with-limited-impact
+    handling: fix-or-recorded-waiver-with-plan
+  informational:
+    definition: observation-or-suggestion
+    handling: advisory-non-blocking
+
+# Floors are Critical by definition.
+floors_are_critical: [accessibility, security, performance-budget, legal]
+
+scoring:
+  score_range: [0, 100]
+  formula: "category_score = 100 - sum(deductions), floored at 0"
+  deductions:
+    critical: 40
+    major: 15
+    minor: 5
+    informational: 0
+  category_pass_threshold: 90
+  overall_score: arithmetic-mean-of-14-gate-scores
+  overall_pass_threshold: 90
+  derived_not_assigned: required
+  zero_tolerance_overrides_score: required   # one Critical fails regardless of score
+
+gate_pass_condition:
+  category_score_min: 90
+  critical_max: 0
+  major_max: 0
+
+rules:
+  objective_criteria: required
+  evidence_required: required
+  tool_assisted_where_applicable: required
+  re_run_after_fix: required
+  record_waivers: memory/decisions.md
+
+# Domain thresholds are owned elsewhere and referenced, not restated.
+threshold_references:
+  core_web_vitals: discoverability.policy.yaml
+  accessibility: experience.policy.yaml
+  contrast: design.policy.yaml
+  component_limits: component-limits.policy.yaml
+  image_budgets: images.policy.yaml
+  readability: content.policy.yaml
+  animation: animation.policy.yaml

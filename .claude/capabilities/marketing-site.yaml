@@ -1,0 +1,62 @@
+# Capability: Marketing Website
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+
+capability: marketing-site
+version: 1.0.0
+
+classification:
+  aliases: [marketing site, marketing website, product site, campaign site]
+  signals:
+    goal: convert-and-inform
+    audience: public-visitor
+    surfaces: few-pages
+    data: content-only
+    auth: none
+    commerce: none
+complexity_default: standard
+
+engines:
+  required:
+    - architecture
+    - platform
+    - components
+    - experience
+    - motion
+    - discoverability
+    - content
+    - assets
+    - quality
+    - operations
+  excluded: []
+
+skills: [taste-skill, frontend-design-skill, emil-frontend-design-skill, emil-motion-skill, ui-ux-pro-max, seo-skill, nextjs-seo-skill]
+mcps: [chrome-devtools-mcp, higgsfield-mcp]
+
+legal_documents:
+  - privacy-policy
+  - cookie-policy
+  - imprint
+  optional: [terms-of-service]
+
+assets:
+  - logo-system
+  - og-image
+  - favicon-set
+  - hero-image
+  optional: [social-assets, illustrations]
+
+workflow:
+  project_type: PT-B            # nearest variant: corporate/marketing multi-page
+  states: all
+  emphasis: [S04, S05, S12]
+
+profiles:
+  architecture: marketing-website   # standards/architecture/folder-structure.md
+  density: comfortable              # experience.policy.yaml
+  motion_level: marketing           # motion.policy.yaml (default 3, ceiling 4)
+  page_sections: corporate_home     # content.policy.yaml (nearest canonical set)
+
+validation:
+  gates: all
+  emphasis: [discoverability, content, experience, performance]
+  release_verification: all

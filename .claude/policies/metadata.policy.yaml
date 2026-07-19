@@ -1,0 +1,52 @@
+# Metadata Policy
+# Framework: CEF · Specification: AS-010 (Discoverability Engine) · Version: 0.1.0
+# Canonical metadata requirements and limits. Single source of truth for
+# discoverability/metadata.md, technical-seo.md, open-graph.md, twitter.md.
+# Documentation MUST match these values.
+
+policy: metadata
+version: 0.1.0
+appliesTo: public-pages
+
+limits:
+  title_max_chars: 60
+  description_max_chars: 160
+
+required_per_page:
+  - title            # unique
+  - description      # unique
+  - canonical
+  - viewport         # width=device-width, initial-scale=1
+  - charset          # utf-8
+  - lang             # <html lang>
+  - robots           # explicit directive
+  - favicon
+  - theme_color
+  - open_graph
+  - twitter_card
+conditional:
+  manifest: when-installable-or-pwa
+  structured_data: when-recognizable-type
+
+uniqueness:
+  title: required
+  description: required
+  no_placeholder: required
+  no_auto_generated_boilerplate: required
+
+open_graph:
+  required: [og:title, og:description, og:type, og:url, og:image]
+  image_width_px: 1200
+  image_height_px: 630
+  image_absolute_https: required
+  og_url_matches_canonical: required
+
+twitter:
+  required: [twitter:card, twitter:title, twitter:description, twitter:image]
+  card_with_hero: summary_large_image
+  reuse_og_image: recommended
+  consistent_with_og: required
+
+implementation:
+  nextjs_metadata_api: required     # no hand-written <head>
+  server_rendered: required

@@ -1,0 +1,60 @@
+# HTTP Security Headers Policy
+# Framework: CEF · Specification: AS-016 (Security & Compliance Engine) · Version: 2.0.0
+# Canonical source of truth for HTTP security headers, CSP, CORS, and framing.
+# Absorbed from AS-014 operational-security@0.1.0 (http_security_headers, header_rules, csp),
+# which no longer carries these values.
+# Consumed by: standards/security/{security-headers,cors,csrf,xss}.md,
+# standards/operations/security-headers.md, checklists/security.md.
+# Documentation MUST match these values.
+
+policy: headers
+version: 2.0.0
+
+http_security_headers:
+  Strict-Transport-Security: required
+  Content-Security-Policy: required
+  X-Content-Type-Options: nosniff
+  X-Frame-Options-or-frame-ancestors: deny-unless-required
+  Referrer-Policy: strict-origin-when-cross-origin-or-stricter
+  Permissions-Policy: deny-unused-features
+  Cross-Origin-Opener-Policy: same-origin-where-practical
+  Cross-Origin-Resource-Policy: same-origin-where-practical
+
+header_rules:
+  verified_on_live_response: required   # chrome-devtools-mcp (TE-08)
+  single_owner: required                # proxy OR app, never both
+  duplicate_conflicting_headers: forbidden
+  server_version_disclosure: forbidden
+
+csp:
+  strict: required
+  unsafe_inline: forbidden-without-recorded-decision
+  unsafe_eval: forbidden-without-recorded-decision
+  wildcards: forbidden-without-recorded-decision
+  default_src: self-or-none
+  object_src: none
+  base_uri: self-or-none
+  frame_ancestors: none-unless-framing-required
+  form_action: self-or-explicit-allowlist
+  nonce_or_hash_over_unsafe_inline: required
+  report_endpoint: recommended
+  report_only_as_permanent_state: forbidden
+
+framing:
+  clickjacking_defense: required
+  frame_ancestors_over_x_frame_options: preferred
+  sensitive_actions_framable: forbidden
+
+cors:
+  default: same-origin
+  allowlist_explicit_origins: required
+  wildcard_origin: forbidden
+  wildcard_origin_with_credentials: forbidden   # rejected by the platform and unsafe
+  reflect_arbitrary_origin: forbidden
+  allowed_methods_minimal: required
+  allowed_headers_minimal: required
+  preflight_max_age_seconds_max: 86400
+  credentials_only_when_required: required
+
+transport_header_note:
+  hsts_values_canonical_in: security.policy.transport

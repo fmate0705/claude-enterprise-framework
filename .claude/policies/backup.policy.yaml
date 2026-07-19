@@ -1,0 +1,65 @@
+# Backup Policy
+# Framework: CEF · Specification: AS-014 (Delivery & Operations Engine) · Version: 0.1.0
+# Canonical backup schedule, retention, encryption, and restore testing. Single source
+# of truth for operations/{backups,restore,disaster-recovery}.md.
+# Documentation MUST match these values.
+
+policy: backup
+version: 0.1.0
+
+required_before_production: true        # any system holding durable state
+
+scope:
+  database: required
+  user_uploaded_assets: required
+  configuration: versioned-in-code
+  infrastructure_definition: versioned-in-code
+  secrets: secret-store-mechanism
+
+schedule:
+  database: daily
+  assets: daily
+  incremental_or_pitr: when-rpo-requires
+
+retention_days: 30                      # MUST satisfy legal + business requirements
+
+encryption:
+  at_rest: required
+  in_transit: required
+  unencrypted_backups: forbidden
+
+storage:
+  off_host: required
+  off_provider: when-risk-model-requires
+  same_host_only_copy: forbidden
+  access_controlled: required
+  audited: required
+
+monitoring:
+  backup_success_failure: monitored
+  alert_on_failure: required
+  silent_failure: forbidden
+  integrity_verification: required      # checksum or test restore
+
+restore:
+  documented_procedure: required
+  executable_by_a_stranger: required
+  test_frequency: monthly
+  test_target: isolated-environment
+  overwrite_production_in_test: forbidden
+  verify_integrity_and_key_flows: required
+  time_against_rto: required
+  failed_test_is_an_incident: required
+  untested_restore_counts_as_backup: false
+
+pre_migration:
+  verified_backup_before_destructive_migration: required
+
+disaster_recovery:
+  rpo_defined: required                 # drives schedule
+  rto_defined: required                 # proven by restore tests
+  written_plan: required
+  plan_tested: required
+  rebuildable_from_code_and_backups: required
+  roles_assigned: required
+  record: memory/deployment.md

@@ -1,0 +1,33 @@
+# Tone Policy
+# Framework: CEF · Specification: AS-011 (Content Intelligence Engine) · Version: 0.1.0
+# Canonical tone spectrum and tone-by-context mapping. Single source of truth for
+# content/tone.md. The default tone is recorded per project in memory/branding.md.
+# Documentation MUST match this mapping.
+
+policy: tone
+version: 0.1.0
+
+spectrum:
+  - formal_casual
+  - serious_playful
+  - matter_of_fact_enthusiastic
+
+# Tone by context (content/tone.md).
+tone_by_context:
+  marketing_hero: confident-benefit-led-warm
+  onboarding: encouraging-clear-patient
+  success: brief-affirming
+  error: calm-specific-helpful          # never blaming
+  empty_state: encouraging-action-oriented
+  legal_privacy: plain-precise-neutral
+  support_docs: clear-patient-thorough
+  destructive_confirmation: serious-unambiguous
+
+rules:
+  default_tone_recorded: required
+  context_appropriate: required
+  voice_constant_across_tones: required
+  errors_never_blame: required
+  legal_never_persuasive: required
+  consistent_within_surface: required
+  clarity_over_forced_personality: required

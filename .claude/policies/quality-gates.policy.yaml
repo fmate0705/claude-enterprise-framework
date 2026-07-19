@@ -1,0 +1,99 @@
+# Quality Gates Policy
+# Framework: CEF · Specification: AS-013 (Quality Assurance Engine) · Version: 0.1.0
+# Canonical definition of the 14 quality gates, their order, and blocking rules.
+# Single source of truth for standards/quality/overview.md.
+# Documentation MUST match these values.
+
+policy: quality-gates
+version: 0.1.0
+
+gates:
+  - id: 1
+    name: architecture
+    review: standards/quality/architecture-review.md
+    checklist: checklists/architecture.md
+    owner: backend-engineer
+  - id: 2
+    name: platform
+    review: standards/quality/code-review.md
+    also: standards/quality/testing-review.md
+    owner: frontend-engineer
+  - id: 3
+    name: components
+    review: standards/quality/code-review.md
+    also: standards/quality/testing-review.md
+    owner: frontend-engineer
+  - id: 4
+    name: experience
+    review: [standards/quality/design-review.md, standards/quality/ux-review.md, standards/quality/brand-review.md]
+    checklist: [checklists/design.md, checklists/branding.md]
+    owner: ui-designer
+  - id: 5
+    name: motion
+    review: standards/quality/design-review.md
+    checklist: checklists/design.md
+    owner: ui-designer
+  - id: 6
+    name: content
+    review: [standards/quality/content-review.md, standards/quality/legal-review.md]
+    checklist: checklists/content.md
+    owner: technical-writer
+  - id: 7
+    name: discoverability
+    review: standards/quality/discoverability-review.md
+    checklist: checklists/seo.md
+    owner: seo-specialist
+  - id: 8
+    name: accessibility
+    review: standards/quality/accessibility-review.md
+    checklist: checklists/accessibility.md
+    owner: accessibility-specialist
+    floor: true
+  - id: 9
+    name: performance
+    review: standards/quality/performance-review.md
+    checklist: checklists/performance.md
+    owner: performance-engineer
+    floor: true
+  - id: 10
+    name: security
+    review: standards/quality/security-review.md
+    checklist: checklists/security.md
+    owner: security-reviewer
+    floor: true
+  - id: 11
+    name: docker
+    review: standards/quality/docker-review.md
+    checklist: checklists/deployment.md
+    owner: devops-engineer
+  - id: 12
+    name: documentation
+    review: standards/quality/release-checklist.md
+    checklist: checklists/release.md
+    owner: technical-writer
+  - id: 13
+    name: memory-update
+    review: standards/quality/release-checklist.md
+    checklist: checklists/release.md
+    owner: technical-writer
+  - id: 14
+    name: production-approval
+    review: standards/quality/production-readiness.md
+    checklist: checklists/release.md
+    owner: product-strategist
+
+rules:
+  order: ascending-by-id
+  bypass: forbidden
+  skip_without_justification: forbidden
+  failed_gate_blocks_advancement: required
+  re_run_after_fix: required
+  floors_never_waived_informally: required   # gates 8, 9, 10 + legal (gate 6)
+
+# Ordering differences with rules/review-engine.md (RV-01) and workflow-engine
+# states S09-S14 are outcome-neutral: every gate MUST pass before deployment.
+reconciliation:
+  rule_engine: rules/review-engine.md
+  workflow_engine: workflow-engine/states.md
+  contradiction: none
+  basis: all-gates-must-pass-before-deployment

@@ -1,0 +1,113 @@
+# Runtime Policy
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+# Canonical classification taxonomy, engine load order, phases, and state machine.
+# Single source of truth for runtime/{project-classifier,engine-loader,task-planner,
+# state-machine}.md. Documentation MUST match these values.
+# The Runtime coordinates engines; it defines no standard (RT-04).
+
+policy: runtime
+version: 1.0.0
+
+# Classification taxonomy -> capability profile (runtime/project-classifier.md).
+classification:
+  types:
+    landing-page:            { capability: landing-page }
+    marketing-website:       { capability: marketing-site }
+    corporate-website:       { capability: corporate-site }
+    agency-website:          { capability: agency-site }
+    portfolio:               { capability: portfolio }
+    saas:                    { capability: saas }
+    dashboard:               { capability: dashboard }
+    internal-application:    { capability: admin-panel }
+    blog:                    { capability: blog }
+    documentation:           { capability: blog, delta: reading-profile-docs-ia }
+    ecommerce:               { capability: ecommerce }
+    marketplace:             { capability: ecommerce, delta: multi-vendor }
+    api:                     { capability: api }
+    fullstack-platform:      { capability: fullstack }
+    multi-tenant-application:{ capability: saas, delta: tenant-isolation }
+  rules:
+    exactly_one_type: required
+    classify_before_planning: required
+    intent_over_wording: required
+    ask_when_undecidable: required
+    guess: forbidden
+    deltas_recorded: memory/decisions.md
+    record_classification: memory/project.md
+
+complexity_tiers: [simple, standard, complex, enterprise]
+complexity_rules:
+  scales_rigor_only: required
+  lower_a_floor: forbidden
+  escalate_on_discovery: required
+
+# Engine load order (runtime/engine-loader.md). Order MUST NOT be violated.
+engine_load_order:
+  - constitution        # kernel
+  - rules               # kernel
+  - workflow            # kernel
+  - knowledge           # kernel
+  - architecture
+  - platform
+  - components
+  - experience
+  - motion
+  - discoverability
+  - content
+  - assets
+  - quality             # gate
+  - operations          # delivery
+engine_rules:
+  kernel_always: [constitution, rules, workflow, knowledge]
+  order_fixed: required
+  skipping_allowed: true          # excluded engines are skipped in place
+  reordering: forbidden
+  closure_resolution: knowledge/loading.md
+  conflict_resolution: knowledge/priorities.md
+  record: memory/architecture.md
+
+# Nine phases (runtime/task-planner.md) mapped to workflow-engine states.
+phases:
+  - { id: 1, name: discovery,               states: [S01, S02, S03] }
+  - { id: 2, name: planning,                states: [S04, S05, S06] }
+  - { id: 3, name: architecture,            states: [S07, S08] }
+  - { id: 4, name: implementation,          states: [S09] }
+  - { id: 5, name: assets,                  states: [S09] }
+  - { id: 6, name: optimization,            states: [S09, S13] }
+  - { id: 7, name: review,                  states: [S10, S11, S12, S13, S14] }
+  - { id: 8, name: deployment-preparation,  states: [S15] }
+  - { id: 9, name: release,                 states: [S15, S16, S17, S18] }
+phase_rules:
+  order: ascending-by-id
+  skip_mandatory_phase: forbidden
+  exit_criteria_enforced: required
+  skip_only_when_capability_excludes_engine: required
+  parallel_lifecycle: forbidden      # phases map to workflow states
+
+# Project states (runtime/state-machine.md).
+states:
+  - initialized
+  - discovery
+  - planning
+  - building
+  - optimization
+  - review
+  - validation
+  - ready-for-release
+  - released
+  - maintenance
+state_rules:
+  exactly_one_state: required
+  undefined_transitions: forbidden
+  forward_skipping: forbidden
+  failure_moves_backward: required
+  full_re_entry_after_backward: required
+  human_approval_before_released: required
+  record_on_change: [memory/session.md, memory/handover.md]
+  authority: workflow-engine/states.md    # this machine is a coarse view
+
+references:
+  workflow_states: workflow-engine/states.md
+  quality_gates: policies/quality-gates.policy.yaml
+  release_decision: policies/release.policy.yaml
+  knowledge_graph: knowledge/dependencies.md

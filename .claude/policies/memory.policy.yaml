@@ -1,0 +1,120 @@
+# AI Product Memory Policy
+# Framework: CEF · Specification: AS-019 (AI Intelligence Platform Engine) · Version: 2.0.0
+#
+# ⚠️ NAME DISAMBIGUATION — TWO FILES SHARE THIS BASENAME. THEY ARE UNRELATED.
+#   policies/memory.policy.yaml  (THIS FILE, AS-019) — memory of an AI PRODUCT BUILT
+#       WITH CEF: session state, user preferences, long-term recall inside the product.
+#   runtime/memory.policy.yaml   (AS-015)            — memory of THE FRAMEWORK ITSELF:
+#       the `.claude/memory/` store CEF uses to stay continuous across its own sessions.
+# Reference either one by its FULL PATH. An unqualified "memory.policy" is ambiguous.
+#
+# Boundaries. Framework memory rules -> rules/memory-engine.md (ME-01..12), AS-015.
+# Retention, consent, deletion, user rights -> privacy.policy (AS-016) — this file
+# defers and never restates them. Retrieval -> rag.policy. Context window -> ai.policy.
+# Documentation MUST match these values.
+
+policy: ai-product-memory
+version: 2.0.0
+disambiguation:
+  this_file_governs: memory-inside-products-built-with-cef
+  not_this_file: runtime/memory.policy.yaml     # the framework's own memory (AS-015)
+
+# --- Memory is a product decision before it is a technical one.
+principles:
+  memory_is_opt_in: required
+  memory_purpose_recorded: required
+  memory_scope_explicit: required
+  remembering_by_default_without_disclosure: forbidden
+  user_can_see_what_is_remembered: required
+  user_can_correct_what_is_remembered: required
+  user_can_delete_what_is_remembered: required
+  memory_is_not_a_dumping_ground: required
+
+# --- Tiers. Each has a distinct lifetime, scope, and privacy posture.
+tiers:
+  session:
+    lifetime: the-conversation
+    scope: one-session
+    persistence: ephemeral-by-default
+    survives_restart: optional
+  user_preferences:
+    lifetime: until-changed-or-deleted
+    scope: one-user
+    persistence: durable
+    explicit_consent: required
+  project:
+    lifetime: until-deleted
+    scope: one-workspace-or-project
+    persistence: durable
+    shared_across_users: recorded-decision-only
+  long_term:
+    lifetime: bounded-by-retention
+    scope: declared
+    persistence: durable
+    explicit_consent: required
+    review_before_write: recommended
+  decision_log:
+    lifetime: bounded-by-retention
+    scope: declared
+    persistence: durable-append-only
+    purpose: auditability
+
+tier_rules:
+  tier_declared_per_item: required
+  tier_mixing: forbidden
+  session_data_silently_promoted_to_long_term: forbidden
+  promotion_requires_explicit_action: required
+
+writes:
+  what_is_written_is_bounded: required
+  model_decides_what_to_remember_unbounded: forbidden
+  write_is_attributable: required
+  write_is_reviewable: required
+  raw_conversation_stored_as_memory: discouraged
+  derived_fact_preferred_over_transcript: required
+  contradictions_resolved_not_accumulated: required
+  memory_growth_bounded: required
+  stale_memory_decays_or_expires: required
+
+reads:
+  retrieval_is_scoped_to_the_principal: required   # AZ-13
+  cross_user_memory_leak: forbidden
+  cross_tenant_memory_leak: forbidden              # AZ-17
+  authorization_checked_per_read: required         # AZ-12
+  memory_injected_into_context_is_untrusted: required
+  memory_carries_instruction_authority: forbidden  # prompt.policy.layer_rules
+
+# --- Memory is an injection surface. Anything written can be read back into context.
+safety:
+  memory_content_treated_as_untrusted_on_read: required   # safety.policy
+  # injection_via_memory_defended -> safety.policy.prompt_injection (canonical)
+  secrets_in_memory: forbidden                     # SM-06
+  credentials_in_memory: forbidden
+  memory_poisoning_considered: required            # threat model (TM-05)
+  user_can_inspect_before_persist: recommended
+
+privacy:
+  ref: privacy.policy                              # AS-016 — canonical, never restated here
+  personal_data_minimized: required
+  special_category_data_in_memory: forbidden-without-legal-review   # PRV-09
+  retention_period_defined: required               # PRV-11
+  deletion_propagates: required                    # PRV-13
+  export_supported: required                       # PRV-25
+  consent_required_for_durable_tiers: required     # PRV-16
+  memory_used_for_training_without_consent: forbidden
+
+integrity:
+  server_authoritative: required
+  client_asserted_memory: forbidden
+  memory_versioned: recommended
+  memory_corruption_detectable: required
+  memory_store_behind_typed_interface: required    # ai.policy.provider
+
+transparency:
+  memory_use_visible_to_user: required
+  silent_personalization: forbidden
+  user_told_why_a_response_used_memory: recommended
+
+review:
+  gate: ai-review
+  anti_patterns: hard-fail

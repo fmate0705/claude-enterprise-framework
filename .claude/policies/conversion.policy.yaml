@@ -1,0 +1,45 @@
+# Conversion Policy
+# Framework: CEF · Specification: AS-008 (Experience Engine) · Version: 0.1.0
+# Canonical CTA hierarchy, section ordering, and trust signals. Single source of
+# truth for experience/{cta,conversion,sections}.md. Documentation MUST match.
+
+policy: conversion
+version: 0.1.0
+
+cta:
+  primary_per_view: 1
+  primary_per_section: 1
+  hierarchy: [primary, secondary, tertiary]   # filled -> outline/ghost -> text link
+  copy: verb-led-benefit-led                  # "click here"/"submit" forbidden
+  min_touch_target_ref: experience.policy.accessibility_thresholds.min_touch_target_px  # canonical 44
+  prominence: most-prominent-action
+  visible_in_hero: required
+  honest_urgency_only: required               # fake urgency/scarcity forbidden
+
+# Canonical landing-page section order (experience/sections.md, conversion.md).
+section_ordering:
+  landing:
+    - hero
+    - social-proof
+    - features-benefits
+    - process
+    - case-studies-testimonials
+    - pricing
+    - faq
+    - final-cta
+    - footer
+
+trust_signals:
+  - real-attributed-testimonials
+  - real-logos
+  - verified-numbers
+  - guarantees
+  - legal-transparency
+  - working-links
+placement: near-decision-points
+
+rules:
+  fabricated_proof: forbidden
+  dark_patterns: forbidden
+  minimal_lead_fields: required
+  faq_before_final_cta: required

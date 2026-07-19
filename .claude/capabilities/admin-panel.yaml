@@ -1,0 +1,60 @@
+# Capability: Admin Panel / Internal Application
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+
+capability: admin-panel
+version: 1.0.0
+
+classification:
+  aliases: [admin panel, internal application, back office, internal tool, cms admin]
+  signals:
+    goal: operate-with-privilege
+    audience: internal-staff
+    surfaces: application-shell
+    data: transactional
+    auth: required-role-based
+    commerce: none
+complexity_default: complex
+
+engines:
+  required:
+    - architecture
+    - platform
+    - components
+    - experience
+    - motion
+    - content
+    - quality
+    - operations
+  excluded:
+    - engine: discoverability
+      reason: "Auth-gated internal tool; intentionally noindex with no public discovery surface. Robots state is still set explicitly."
+    - engine: assets
+      reason: "No brand-asset production surface; consumes the existing identity."
+
+skills: [frontend-design-skill, ui-ux-pro-max]
+mcps: [chrome-devtools-mcp]
+
+legal_documents:
+  - privacy-policy               # internal data handling still requires disclosure
+  optional: [terms-of-service]
+
+assets: []
+
+workflow:
+  project_type: PT-J            # workflow-engine/project-types.md
+  states: all
+  emphasis: [S06, S07, S14]     # bulk-action UX, dense UI, security
+  deltas: [rbac, audit-logging, destructive-action-confirmation]
+  relaxed: [S12]                # SEO review reduced to explicit noindex verification
+
+profiles:
+  architecture: admin-panel     # standards/architecture/project-types.md
+  density: dense                # experience.policy.yaml
+  motion_level: admin           # motion.policy.yaml (default 1, ceiling 1)
+  page_sections: none           # app surface; microcopy per content/ux-writing.md
+
+validation:
+  gates: all-applicable
+  floors_not_applicable: forbidden
+  emphasis: [security, accessibility, performance]
+  release_verification: all

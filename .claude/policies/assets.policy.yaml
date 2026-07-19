@@ -1,0 +1,71 @@
+# Assets Policy
+# Framework: CEF · Specification: AS-012 (Brand & Asset Intelligence Engine) · Version: 0.1.0
+# Canonical folder structure, naming conventions, favicon sizes, licensing rules,
+# brand-consistency checks, and review gates. Single source of truth for
+# assets/asset-organization.md, assets/favicons.md, assets/licensing.md, assets/review.md.
+# Documentation MUST match these values.
+
+policy: assets
+version: 0.1.0
+
+folder_structure:
+  root: assets/
+  directories:
+    - images/
+    - logos/
+    - icons/
+    - illustrations/
+    - og/
+    - social/
+    - favicons/
+    - brand/
+  unstructured_dump: forbidden
+
+naming:
+  convention: descriptive-kebab-case
+  variant_size_suffix: allowed        # logo-mark-dark.svg, hero-clinic-01@2x.avif
+  generic_names: forbidden
+  one_canonical_version: required
+  versioning: content-hash-or-suffix
+
+favicon_sizes_px: [16, 32, 48, 180, 192, 512]  # ico(16/32/48), apple-touch(180), pwa(192/512)
+favicon:
+  derive_from_icon_mark: required
+  legible_at_16px: required
+  placeholder_default: forbidden
+
+licensing:
+  documented_rights_per_asset: required
+  unknown_rights: forbidden
+  watermarked_assets: forbidden
+  commercial_license_when_required: required
+  attribution_when_required: required
+  record_in_memory: memory/decisions.md
+  disclaimer: not-legal-advice        # confirm with a professional
+
+brand_consistency_checks:
+  follows_art_direction: required
+  one_style_per_medium: required      # illustration/icon/photo/grade
+  on_palette: required
+  logo_usage_rules: enforced
+  consistent_across_surfaces: required
+
+# Asset review gates (assets/review.md).
+review_gates:
+  - brand-consistency
+  - image-quality
+  - composition
+  - accessibility
+  - performance
+  - seo
+  - licensing
+  - responsiveness
+  - color-accuracy
+
+enforcement:
+  gate: asset-review
+  accessibility: floor
+  performance: floor
+  licensing: hard-gate
+  anti_patterns: hard-fail
+  waiver: recorded-scoped-user-decision-only

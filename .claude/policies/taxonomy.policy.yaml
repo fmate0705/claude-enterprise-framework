@@ -1,0 +1,93 @@
+# Content Taxonomy Policy
+# Framework: CEF · Specification: AS-018 (Content Operations Engine) · Version: 2.0.0
+# Canonical source of truth for content classification: categories, tags, navigation,
+# and relationships.
+#
+# Boundaries. This is CONTENT taxonomy. COMPONENT classification is owned by
+# components/taxonomy.md (AS-007) and is unrelated. Commerce collections/categories/tags
+# are owned by commerce/collections.md (AS-017) and follow the same three-structure model
+# stated here. Information architecture -> content/information-architecture.md (AS-011).
+# URL structure -> DE-ROUTING. Search -> content-operations.policy.search.
+# Documentation MUST match these values.
+
+policy: taxonomy
+version: 2.0.0
+
+# --- Three structures. They are not interchangeable.
+structures:
+  category:
+    shape: single-hierarchy
+    purpose: what-the-content-is
+    membership: exactly-one-per-item
+  tag:
+    shape: flat
+    purpose: attributes-for-filtering
+    membership: many-per-item
+  collection:
+    shape: flat-overlapping
+    purpose: editorial-grouping
+    membership: many-per-item
+
+rules:
+  one_category_per_item: required
+  category_hierarchy_single: required
+  max_category_depth: 3
+  tags_hierarchical: forbidden
+  simulate_one_structure_with_another: forbidden
+  structure_chosen_before_content_created: required
+
+categories:
+  vocabulary_controlled: required
+  named_in_reader_language: required
+  empty_category_navigable: forbidden
+  category_change_is_a_migration: required
+  breadcrumbs_follow_hierarchy: required     # D-064; BreadcrumbList JSON-LD (SE-03)
+  orphan_category: forbidden
+
+tags:
+  vocabulary_controlled: required
+  free_text_tagging: forbidden               # produces waterproof, water-proof, Waterproof
+  new_tag_requires_editor_role: required
+  synonym_mapping_maintained: required
+  tag_merge_supported: required
+  tag_rename_preserves_references: required
+  internal_tags_exposed_to_readers: forbidden
+  unused_tag_pruned: required
+  max_tags_per_item: 10
+
+relationships:
+  explicit_and_typed: required
+  referential_integrity_enforced: required
+  broken_reference: forbidden
+  delete_checks_references: required         # deleting a referenced author breaks articles
+  cascade_behavior_declared: required
+  circular_relationship_guarded: required
+  author_relationship_required_for: [article, case-study]
+
+navigation:
+  navigation_is_content: required            # modeled, not hard-coded in components
+  hardcoded_navigation_in_code: forbidden
+  navigation_item_resolves_to_real_target: required
+  broken_navigation_link: forbidden
+  orphan_page_unreachable_from_navigation: forbidden
+  max_primary_items: 7                       # D-060
+  navigation_changes_audited: required
+
+urls:
+  derived_from_taxonomy_deliberately: required
+  slug_stable: required
+  slug_change_creates_redirect: required     # 301
+  redirect_chain_bounded: required
+  duplicate_content_across_taxonomies: forbidden   # SE-02 canonical
+  canonical_declared: required
+
+governance:
+  taxonomy_owner_named: required
+  ad_hoc_taxonomy_growth: forbidden
+  taxonomy_reviewed_periodically: required
+  unused_terms_pruned: required
+  taxonomy_documented: required
+
+review:
+  gate: content-operations-review
+  anti_patterns: hard-fail

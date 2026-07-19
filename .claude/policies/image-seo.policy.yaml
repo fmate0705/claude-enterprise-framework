@@ -1,0 +1,37 @@
+# Image SEO Policy
+# Framework: CEF · Specification: AS-012 (Brand & Asset Intelligence Engine) · Version: 0.1.0
+# Canonical image-discoverability rules. Single source of truth for assets/image-seo.md.
+# Documentation MUST match these values.
+
+policy: image-seo
+version: 0.1.0
+
+alt_text:
+  content_images: required        # meaningful alt
+  decorative_images: empty-alt    # alt=""
+  missing_alt: forbidden          # accessibility floor
+  keyword_stuffing: forbidden
+
+filenames:
+  convention: descriptive-kebab-case
+  generic_names: forbidden        # IMG_0432.jpg, image1.png
+
+captions:
+  use_figure_figcaption_when_helpful: required
+  repeat_alt: forbidden
+
+structured_data:
+  reference_images_in_jsonld: required  # product/article/etc.
+  ref: discoverability/structured-data.md
+
+social:
+  og_image: required              # dimensions per metadata.policy.yaml
+  twitter_image_consistent: required
+
+entity_alignment:
+  images_align_with_entity: required
+  ref: discoverability/entity-seo.md
+
+crawlability:
+  crawlable_markup: required      # real <img>/next/image, not script-only
+  image_sitemap_when_significant: recommended

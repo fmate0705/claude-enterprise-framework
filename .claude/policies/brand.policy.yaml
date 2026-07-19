@@ -1,0 +1,77 @@
+# Brand Policy
+# Framework: CEF · Specification: AS-012 (Brand & Asset Intelligence Engine) · Version: 0.1.0
+# Canonical brand-strategy workflow, art-direction dimensions, logo variants, and
+# image-generation spec fields. Single source of truth for assets/brand-strategy.md,
+# assets/art-direction.md, assets/logo-system.md. Documentation MUST match these values.
+
+policy: brand
+version: 0.1.0
+
+# Brand strategy workflow (assets/brand-strategy.md) — ordered, no step skipped.
+brand_strategy_workflow:
+  - business
+  - audience
+  - positioning
+  - brand-personality
+  - visual-direction
+  - color-palette
+  - typography
+  - photography-style
+  - illustration-style
+  - motion-style
+  - assets
+rules_strategy:
+  system_before_assets: required
+  record_in_memory: memory/branding.md
+  real_inputs: required               # never fabricate brand
+  coherent_chain: required
+
+# Art direction dimensions (assets/art-direction.md).
+art_direction_dimensions:
+  - visual-mood
+  - lighting
+  - composition
+  - perspective
+  - depth
+  - negative-space
+  - consistency
+  - color-grading
+  - background-treatment
+  - focus
+rules_art_direction:
+  direction_before_assets: required
+  every_asset_follows_direction: required
+  premium_restrained_language: required
+
+# Logo variants (assets/logo-system.md).
+logo_variants:
+  - primary
+  - secondary
+  - icon-mark
+  - monochrome
+  - dark-mode
+  - light-mode
+rules_logo:
+  vector_source: required
+  minimum_sizing: defined-and-respected
+  clear_space: defined-and-respected
+  improper_usage: forbidden
+
+# Image generation spec (Higgsfield MCP) — required fields per generation.
+generation_spec_fields:
+  - purpose
+  - target-audience
+  - visual-style
+  - aspect-ratio
+  - resolution
+  - color-palette
+  - composition
+  - brand-alignment
+rules_generation:
+  tool: higgsfield-mcp                 # TE-09
+  system_defined_before_generation: required
+  full_brief_required: required        # all spec fields
+  brand_aligned_output: required
+  no_generic_ai_look: required
+  optimize_after_generation: required
+  record_licensing: required

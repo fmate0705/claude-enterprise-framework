@@ -1,0 +1,118 @@
+# Publishing Policy
+# Framework: CEF · Specification: AS-018 (Content Operations Engine) · Version: 2.0.0
+# Canonical source of truth for publishing: immediate and scheduled publication,
+# preview, rollback, expiration, notifications, and rendering strategy.
+#
+# Boundaries. Editorial states and approvals -> editorial.policy.yaml. Versioning ->
+# content-operations.policy.versioning. Deployment promotion -> deployment.policy.yaml
+# (AS-014). SEO metadata -> discoverability.policy.yaml (AS-010).
+# Documentation MUST match these values.
+
+policy: publishing
+version: 2.0.0
+
+# --- Publishing is deliberate. It is an act, never a side effect.
+principles:
+  publishing_is_deliberate: required
+  publish_requires_approval: required       # editorial.policy.approvals
+  publish_is_an_explicit_action: required
+  save_publishes: forbidden                 # saving is not publishing
+  accidental_publish_recoverable: required
+
+immediate:
+  approval_verified_at_publish: required
+  approval_bound_to_the_published_version: required
+  publisher_role_required: required
+  publish_creates_a_revision: required
+  publish_logged_and_attributed: required
+
+scheduled:
+  supported: required
+  timezone_explicit: required               # a schedule without a zone is a guess
+  timezone_stored_utc: required
+  schedule_visible_to_editors: required
+  schedule_cancellable: required
+  schedule_editable_before_firing: required
+  approval_revalidated_at_fire: required    # approval may have expired or been withdrawn
+  edit_after_scheduling_requires_reapproval: required
+  missed_schedule_alerted: required         # a silently missed publish is invisible
+  missed_schedule_publishes_silently_late: forbidden
+  past_date_schedule_rejected: required
+  scheduled_content_public_before_time: forbidden
+
+preview:
+  environment_available: required
+  preview_renders_real_layout: required     # a preview that lies is worse than none
+  preview_authorized: required              # AZ-15; unguessable is not authorized
+  preview_indexable: forbidden              # robots noindex (SE-08)
+  preview_link_expires: required
+  preview_of_scheduled_state_supported: required
+  preview_of_any_revision_supported: required
+
+# --- Rollback. The safety net that makes deliberate publishing safe to get wrong.
+rollback:
+  supported: required
+  rollback_time_bounded: required
+  rollback_creates_new_revision: required   # never rewrites history
+  rollback_logged_and_attributed: required
+  rollback_restores_media_references: required
+  rollback_requires_publisher_role: required
+  rollback_available_without_engineering: required   # editors recover their own mistakes
+
+restoration:
+  any_retained_revision_restorable: required
+  restore_previews_before_applying: required
+  restore_creates_new_revision: required
+  restore_reason_recorded: required
+
+unpublish:
+  supported: required
+  unpublish_is_not_deletion: required
+  url_returns_defined_status: required      # 404 or 410, decided deliberately
+  unpublish_removes_from_index: required    # content-operations.policy.search
+  unpublish_cascades_to_translations_ref: localization.policy.publishing_sync.source_unpublish_cascades
+  silent_disappearance: forbidden           # redirect or explain; never vanish
+
+expiration:
+  supported: required
+  expiry_date_optional_per_type: required
+  expiry_behavior_declared: required        # unpublish | archive | flag-for-review
+  expiry_silently_deletes: forbidden
+  expiring_content_alerts_owner_before: required
+  expired_content_left_live: forbidden      # stale content is a trust defect
+  time_sensitive_types_require_expiry: [event, download, article]
+
+notifications:
+  publish_notifies_stakeholders: required
+  schedule_failure_notifies: required
+  approval_request_notifies_reviewer: required
+  rejection_notifies_author: required
+  expiry_notifies_owner: required
+  notification_failure_does_not_block_publish: required
+  notification_is_never_the_record: required
+
+# --- Rendering. Provider-agnostic; the strategy is a recorded decision.
+rendering:
+  strategy_recorded: required               # memory/decisions.md
+  supported: [static-generation, incremental-regeneration, server-rendering]
+  default: static-generation
+  publish_triggers_rebuild_or_revalidation: required
+  stale_cache_after_publish: forbidden
+  revalidation_bounded: required
+  webhook_triggered_publish_authenticated: required   # IV-25, API-22
+  webhook_idempotent: required
+  rebuild_failure_alerted: required
+  rebuild_failure_leaves_stale_content_silently: forbidden
+
+integrity:
+  published_content_matches_approved_version: required
+  publish_is_atomic: required               # partial publish forbidden
+  partial_publish_visible: forbidden
+  broken_link_at_publish_blocks: required
+  missing_alt_at_publish_blocks: required   # accessibility floor
+  missing_metadata_at_publish_blocks: required   # SE-01, SE-02
+
+review:
+  gate: content-operations-review
+  browser_verification: chrome-devtools-mcp   # TE-08
+  anti_patterns: hard-fail

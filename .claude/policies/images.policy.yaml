@@ -1,0 +1,46 @@
+# Images Policy
+# Framework: CEF · Specification: AS-012 (Brand & Asset Intelligence Engine) · Version: 0.1.0
+# Canonical image formats, size budgets, compression targets, and responsive rules.
+# Single source of truth for assets/image-optimization.md and assets/responsive-images.md.
+# Documentation MUST match these values.
+
+policy: images
+version: 0.1.0
+
+formats:
+  primary_photo: [avif, webp]
+  photo_fallback: [jpeg, png]
+  vector: svg
+  jpeg_png_only: forbidden        # must offer a modern format
+
+size_budget_kb:                   # targets; oversized assets never shipped
+  hero_max: 200
+  content_max: 150
+  thumbnail_max: 50
+
+compression:
+  target_quality: 80              # balance size and fidelity
+  visible_artifacts: forbidden
+
+dimensions:
+  explicit_width_height: required # prevent CLS
+  export_at_display_size: required
+  oversized_source: forbidden     # e.g., 4000px into a 400px slot
+
+responsive:
+  srcset_sizes_or_next_image: required
+  defined_breakpoints_only: required
+  lazy_below_fold: required
+  priority_lcp: required          # LCP image never lazy-loaded
+  retina_density: "2x"
+  art_directed_picture_when_crop_changes: required
+
+delivery:
+  long_lived_cache: required
+  content_hashed_filenames: required
+  cdn: recommended
+  strip_metadata: recommended
+
+references:
+  og_image_dimensions: metadata.policy.yaml   # 1200x630 owned by AS-010
+  performance_budget: platform/performance.md  # floor

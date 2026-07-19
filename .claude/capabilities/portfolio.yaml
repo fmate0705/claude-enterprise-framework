@@ -1,0 +1,62 @@
+# Capability: Portfolio
+# Framework: CEF · Specification: AS-015 (Runtime Engine) · Version: 1.0.0
+
+capability: portfolio
+version: 1.0.0
+
+classification:
+  aliases: [portfolio, personal site, showcase, work site]
+  signals:
+    goal: showcase-work-and-convert-to-inquiries
+    audience: public-visitor
+    surfaces: few-pages
+    data: content-only
+    auth: none
+    commerce: none
+complexity_default: simple
+
+engines:
+  required:
+    - architecture
+    - platform
+    - components
+    - experience
+    - motion
+    - discoverability
+    - content
+    - assets
+    - quality
+    - operations
+  excluded: []
+
+skills: [taste-skill, frontend-design-skill, emil-frontend-design-skill, emil-motion-skill, ui-ux-pro-max, seo-skill, nextjs-seo-skill]
+mcps: [chrome-devtools-mcp, higgsfield-mcp]
+
+legal_documents:
+  - privacy-policy
+  - imprint
+  optional: [cookie-policy]     # required when non-essential cookies are used
+
+assets:                         # the work IS the asset set
+  - logo-system
+  - og-image
+  - favicon-set
+  - work-imagery
+  optional: [hero-image, illustrations]
+
+workflow:
+  project_type: PT-C            # workflow-engine/project-types.md
+  states: all
+  emphasis: [S05, S07, S13]     # brand, UI, performance (image-heavy)
+  deltas: [case-study-content-model]
+
+profiles:
+  architecture: portfolio       # standards/architecture/project-types.md
+  density: comfortable          # experience.policy.yaml
+  motion_level: marketing       # motion.policy.yaml
+  page_sections: portfolio      # content.policy.yaml
+
+validation:
+  gates: all
+  emphasis: [assets, experience, performance]
+  release_verification: all
