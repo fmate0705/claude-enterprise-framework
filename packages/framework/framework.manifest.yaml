@@ -1,0 +1,8 @@
+# CEF Framework manifest — the catalog the CLI reads to discover engines.
+#
+# The engine catalog is populated during the M1 migration of the existing `.claude/`
+# content into this package. An empty engine list here is an honest seed, not a
+# placeholder: the CLI's CapabilityLoader reads whatever is declared, and nothing is
+# hardcoded in the CLI (ARCHITECTURE.md §7, KD-4).
+frameworkVersion: 2
+engines: []

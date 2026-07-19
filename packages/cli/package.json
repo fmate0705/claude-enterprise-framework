@@ -1,0 +1,29 @@
+{
+  "name": "@cef/cli",
+  "version": "0.0.0",
+  "description": "The Claude Enterprise Framework command-line application.",
+  "license": "MIT",
+  "author": "Klivo",
+  "type": "module",
+  "bin": {
+    "cef": "./dist/bin/cef.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean"
+  },
+  "dependencies": {
+    "@cef/core": "workspace:*"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@cef/core",
+  "version": "0.0.0",
+  "description": "Runtime, plugin SDK, and domain types for the CEF CLI.",
+  "license": "MIT",
+  "author": "Klivo",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean"
+  }
+}
