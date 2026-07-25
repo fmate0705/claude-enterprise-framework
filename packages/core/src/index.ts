@@ -1,9 +1,14 @@
 /**
  * `@cef/core` — the runtime, plugin SDK, and domain types for the CEF CLI.
  *
- * This package is the innermost layer of the architecture (see `ARCHITECTURE.md` §5): it
- * depends on nothing outside itself and is consumed by every other package. Milestone M1
- * fills in the domain entities, ports, `Result` model, and plugin SPI; M0 establishes the
- * package boundary and the version constant used for framework-compatibility checks.
+ * The innermost layer of the architecture (`ARCHITECTURE.md` §5): it depends on nothing
+ * outside itself and is consumed by every other package.
  */
 export const CEF_CORE_VERSION = '0.0.0';
+
+export * from './errors.js';
+export * from './result.js';
+export * from './container.js';
+export * from './ports.js';
+export * from './domain.js';
+export * from './generation.js';
