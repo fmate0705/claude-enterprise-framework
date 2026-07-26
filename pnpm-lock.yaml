@@ -38,6 +38,9 @@ importers:
       '@cef/core':
         specifier: workspace:*
         version: link:../core
+      '@cef/runtime':
+        specifier: workspace:*
+        version: link:../runtime
       '@clack/prompts':
         specifier: ^0.10.0
         version: 0.10.1
@@ -54,6 +57,18 @@ importers:
   packages/core: {}
 
   packages/framework: {}
+
+  packages/runtime:
+    dependencies:
+      '@cef/core':
+        specifier: workspace:*
+        version: link:../core
+      yaml:
+        specifier: ^2.6.1
+        version: 2.9.0
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
 
 packages:
 

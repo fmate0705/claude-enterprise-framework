@@ -16,6 +16,7 @@ export type {
 } from './commands/command.js';
 export { buildProgram } from './program.js';
 export { CreateCommand, ProjectGenerator, deriveCapabilities } from './commands/create/index.js';
+export { RuntimeCommand } from './commands/runtime/index.js';
 export {
   NodeFileSystem,
   ClackPrompter,
