@@ -38,6 +38,9 @@ importers:
       '@cef/core':
         specifier: workspace:*
         version: link:../core
+      '@cef/framework':
+        specifier: workspace:*
+        version: link:../framework
       '@cef/runtime':
         specifier: workspace:*
         version: link:../runtime
@@ -56,7 +59,17 @@ importers:
 
   packages/core: {}
 
-  packages/framework: {}
+  packages/framework:
+    dependencies:
+      '@cef/core':
+        specifier: workspace:*
+        version: link:../core
+      yaml:
+        specifier: ^2.6.1
+        version: 2.9.0
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
 
   packages/runtime:
     dependencies:

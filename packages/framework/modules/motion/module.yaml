@@ -1,0 +1,22 @@
+id: motion
+name: Motion
+version: 1.0.0
+category: interface
+priority: 40
+description: Purposeful motion that communicates state, hierarchy, or continuity.
+engines: [motion]
+capabilities: [motion, animation]
+dependsOn: [frontend]
+projectTypes: [landing-page, corporate, portfolio, saas, marketing]
+frameworks: [nextjs, react, remix]
+skills: [emil-motion]
+mcp: []
+tokenEstimate: 260
+tags: [motion, animation, transitions, reduced-motion]
+summary: >-
+  Admit motion only when it communicates. Keep it under 300ms, honor prefers-reduced-motion,
+  and stay within the performance budget.
+prompt: >-
+  Add motion only where it conveys state or hierarchy. Duration <= 300ms, standard easing,
+  and always honor prefers-reduced-motion.
+specFile: spec.md

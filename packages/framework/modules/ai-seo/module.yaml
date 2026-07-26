@@ -1,0 +1,22 @@
+id: ai-seo
+name: AI SEO
+version: 1.0.0
+category: discoverability
+priority: 60
+description: Answer-engine citability — llms.txt, extractable structure.
+engines: [ai-seo]
+capabilities: [ai-seo, ai-discoverability]
+dependsOn: [seo]
+projectTypes: [landing-page, corporate, saas, marketing, blog, documentation]
+frameworks: [nextjs, react, astro, remix]
+skills: []
+mcp: []
+tokenEstimate: 300
+tags: [ai-seo, llms-txt, citability, structured-content, answer-engines]
+summary: >-
+  Make content citable by AI answer engines: a truthful llms.txt, consistent Schema.org
+  entities, and extractable, question-shaped content structure.
+prompt: >-
+  Ship a truthful llms.txt, keep Schema.org entities consistent across pages, and structure
+  facts in semantic elements under clear, question-shaped headings.
+specFile: spec.md

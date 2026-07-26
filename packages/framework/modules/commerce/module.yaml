@@ -1,0 +1,22 @@
+id: commerce
+name: Commerce
+version: 1.0.0
+category: commerce
+priority: 55
+description: Product model, pricing, checkout, payments, and orders.
+engines: [commerce]
+capabilities: [commerce, checkout, payments]
+dependsOn: [foundation, security]
+projectTypes: [ecommerce, saas, marketing]
+frameworks: [nextjs, remix]
+skills: []
+mcp: []
+tokenEstimate: 480
+tags: [commerce, pricing, checkout, payments, orders, cart]
+summary: >-
+  Never trust client-asserted price or state; validate every amount server-side. Guard
+  stock and discounts; make checkout idempotent and its failures recoverable.
+prompt: >-
+  Compute and validate prices, discounts, and stock server-side; never trust client state;
+  make mutations idempotent; handle declined payments and out-of-stock explicitly.
+specFile: spec.md

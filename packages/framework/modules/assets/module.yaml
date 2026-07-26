@@ -1,0 +1,22 @@
+id: assets
+name: Assets
+version: 1.0.0
+category: media
+priority: 40
+description: Fast, accessible imagery and brand assets.
+engines: [assets]
+capabilities: [assets, images]
+dependsOn: [foundation]
+projectTypes: [landing-page, corporate, portfolio, marketing, ecommerce]
+frameworks: [nextjs, react, astro, remix]
+skills: []
+mcp: [higgsfield]
+tokenEstimate: 260
+tags: [assets, images, media, avif, optimization, brand]
+summary: >-
+  Serve modern formats with explicit dimensions and responsive sizes. Prioritize the LCP
+  image; use meaningful alt text; never ship unsized or oversized media.
+prompt: >-
+  Use AVIF/WebP with width/height and responsive sizes; prioritize the LCP image, lazy-load
+  the rest, and give content images meaningful alt text.
+specFile: spec.md

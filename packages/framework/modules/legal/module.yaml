@@ -1,0 +1,22 @@
+id: legal
+name: Legal
+version: 1.0.0
+category: compliance
+priority: 85
+description: Required policies and disclosures — a floor.
+engines: [legal]
+capabilities: [legal, compliance]
+dependsOn: [foundation]
+projectTypes: [corporate, saas, ecommerce, marketing, blog, fullstack]
+frameworks: [nextjs, react, astro, remix]
+skills: []
+mcp: []
+tokenEstimate: 300
+tags: [legal, privacy, terms, cookies, impressum, floor]
+summary: >-
+  Ship required legal pages (privacy, terms, cookies, impressum). Generated legal copy is a
+  draft that MUST be reviewed by a qualified legal professional before publication.
+prompt: >-
+  Include the required legal pages for the jurisdiction. Treat generated legal text as a
+  draft; state clearly that it needs review by a qualified legal professional.
+specFile: spec.md

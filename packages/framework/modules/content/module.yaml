@@ -1,0 +1,22 @@
+id: content
+name: Content
+version: 1.0.0
+category: content
+priority: 50
+description: Content model, editorial workflow, versioning, and publishing.
+engines: [content]
+capabilities: [content, editorial, publishing]
+dependsOn: [foundation]
+projectTypes: [blog, documentation, corporate, marketing, ecommerce]
+frameworks: [nextjs, astro, remix]
+skills: []
+mcp: []
+tokenEstimate: 360
+tags: [content, cms, editorial, publishing, versioning, localization]
+summary: >-
+  Model content explicitly, review before publish (author is never the approver), keep an
+  append-only history, and make missed schedules visible.
+prompt: >-
+  Define a content model; require review before publish and never let the author approve
+  their own work; keep history append-only; surface any missed scheduled publish.
+specFile: spec.md

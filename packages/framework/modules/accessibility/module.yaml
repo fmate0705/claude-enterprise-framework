@@ -1,0 +1,22 @@
+id: accessibility
+name: Accessibility
+version: 1.0.0
+category: quality
+priority: 90
+description: WCAG 2.2 AA conformance — a non-negotiable floor.
+engines: [accessibility]
+capabilities: [accessibility, a11y]
+dependsOn: [frontend]
+projectTypes: [all]
+frameworks: [nextjs, react, astro, remix]
+skills: []
+mcp: []
+tokenEstimate: 340
+tags: [accessibility, wcag, a11y, keyboard, contrast, floor]
+summary: >-
+  Build to WCAG 2.2 AA from the first line. Semantic elements, reachable focus, sufficient
+  contrast, and full keyboard operation. Accessibility is a floor.
+prompt: >-
+  Use semantic controls with visible focus and AA contrast. Every flow is keyboard
+  operable; honor reduced motion; label every control.
+specFile: spec.md

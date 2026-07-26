@@ -1,0 +1,22 @@
+id: docker
+name: Docker
+version: 1.0.0
+category: operations
+priority: 65
+description: Reproducible, containerized environments.
+engines: [docker]
+capabilities: [docker, containers]
+dependsOn: [foundation]
+projectTypes: [all]
+frameworks: [nextjs, react, astro, remix]
+skills: []
+mcp: []
+tokenEstimate: 280
+tags: [docker, containers, reproducible, compose, healthcheck]
+summary: >-
+  Define environments as code that build reproducibly from a clean checkout. Multi-stage
+  production image, healthcheck, and no secrets baked into any layer.
+prompt: >-
+  Provide a multi-stage Dockerfile and compose that build reproducibly, expose a
+  healthcheck, and never bake secrets into an image layer.
+specFile: spec.md

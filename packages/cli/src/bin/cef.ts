@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { CommandRegistry } from '../commands/command.js';
 import { CreateCommand } from '../commands/create/index.js';
+import { FrameworkCommand } from '../commands/framework/index.js';
 import { RuntimeCommand } from '../commands/runtime/index.js';
 import { composeContainer, Tokens } from '../di.js';
 import { buildProgram } from '../program.js';
@@ -18,7 +19,8 @@ async function main(): Promise<void> {
 
   const registry = new CommandRegistry()
     .register(new CreateCommand(ports, readCliVersion()))
-    .register(new RuntimeCommand());
+    .register(new RuntimeCommand())
+    .register(new FrameworkCommand());
 
   const program = buildProgram(registry, logger);
   await program.parseAsync(process.argv);

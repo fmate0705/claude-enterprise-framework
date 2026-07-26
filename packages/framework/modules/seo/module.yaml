@@ -1,0 +1,22 @@
+id: seo
+name: SEO
+version: 1.0.0
+category: discoverability
+priority: 70
+description: Search discoverability — metadata, structured data, sitemaps.
+engines: [seo]
+capabilities: [seo, metadata, structured-data]
+dependsOn: [foundation]
+projectTypes: [landing-page, corporate, portfolio, saas, marketing, blog, ecommerce, documentation]
+frameworks: [nextjs, react, astro, remix]
+skills: [seo-skill]
+mcp: []
+tokenEstimate: 420
+tags: [seo, metadata, sitemap, canonical, structured-data, discoverability]
+summary: >-
+  Every public page ships unique metadata, a canonical URL, structured data, and a sitemap
+  entry. Semantic headings and descriptive internal links.
+prompt: >-
+  Author a unique title, description, and canonical per page; emit JSON-LD for its type;
+  keep one h1 with ordered headings; keep the sitemap and robots current.
+specFile: spec.md

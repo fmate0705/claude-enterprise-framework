@@ -1,0 +1,22 @@
+id: security
+name: Security
+version: 1.0.0
+category: quality
+priority: 95
+description: Defensible against hostile input — a floor.
+engines: [security]
+capabilities: [security, compliance]
+dependsOn: [foundation]
+projectTypes: [all]
+frameworks: [nextjs, react, astro, remix]
+skills: []
+mcp: []
+tokenEstimate: 400
+tags: [security, validation, secrets, headers, authorization, floor]
+summary: >-
+  Validate all input, guard every trust boundary, and keep secrets server-only. Assume
+  hostile input from the first line. Security is a floor.
+prompt: >-
+  Validate and sanitize input at every boundary, enforce authorization server-side,
+  parameterize queries, set security headers, and never expose secrets to the client.
+specFile: spec.md

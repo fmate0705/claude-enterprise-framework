@@ -1,0 +1,22 @@
+id: frontend
+name: Frontend
+version: 1.0.0
+category: interface
+priority: 80
+description: Design system, UX flow, and the component architecture.
+engines: [design, experience, components, frontend]
+capabilities: [frontend, design, ux, components]
+dependsOn: [foundation]
+projectTypes: [landing-page, corporate, portfolio, saas, dashboard, ecommerce, blog, marketing, documentation, fullstack]
+frameworks: [nextjs, react, astro, remix]
+skills: [taste, frontend-design, uiux-pro-max, emil-frontend-design]
+mcp: []
+tokenEstimate: 620
+tags: [design, ui, ux, components, tokens, layout]
+summary: >-
+  Build from design tokens and a reusable component system. Every component ships all
+  states; layouts are intentional, not centered-by-default.
+prompt: >-
+  Use design tokens and shared components with defined variants and states. Compose
+  layouts for the content; render empty, loading, and error states.
+specFile: spec.md

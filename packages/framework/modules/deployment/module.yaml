@@ -1,0 +1,22 @@
+id: deployment
+name: Deployment
+version: 1.0.0
+category: operations
+priority: 65
+description: Safe, reversible, reproducible releases.
+engines: [deployment]
+capabilities: [deployment, release]
+dependsOn: [docker]
+projectTypes: [all]
+frameworks: [nextjs, react, astro, remix]
+skills: []
+mcp: []
+tokenEstimate: 300
+tags: [deployment, release, rollback, health, promotion]
+summary: >-
+  Release safely and reversibly: reproducible artifact, configured secrets, health checks,
+  and a tested rollback. Promote in order preview -> staging -> production.
+prompt: >-
+  Ship an immutable versioned artifact with configured secrets and health checks; verify a
+  tested rollback path; promote preview -> staging -> production, never straight to prod.
+specFile: spec.md

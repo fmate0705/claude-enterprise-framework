@@ -1,0 +1,22 @@
+id: foundation
+name: Foundation
+version: 1.0.0
+category: foundation
+priority: 100
+description: Constitution, rule engine, architecture, and the platform baseline.
+engines: [core, architecture, platform, validation]
+capabilities: [foundation, architecture, platform]
+dependsOn: []
+projectTypes: [all]
+frameworks: [nextjs, react, astro, remix]
+skills: []
+mcp: []
+tokenEstimate: 380
+tags: [core, architecture, platform, rules, constitution]
+summary: >-
+  The non-negotiable baseline: server-first architecture, strict TypeScript, focused
+  modules, and the priority order. Everything else builds on this.
+prompt: >-
+  Build server-first with strict TypeScript. Keep files focused, name for intent, and
+  resolve trade-offs by the priority order (correctness > accessibility > performance).
+specFile: spec.md

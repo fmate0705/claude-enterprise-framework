@@ -1,0 +1,22 @@
+id: performance
+name: Performance
+version: 1.0.0
+category: quality
+priority: 90
+description: Core Web Vitals and bundle size as hard budgets — a floor.
+engines: [performance]
+capabilities: [performance, web-vitals]
+dependsOn: [foundation]
+projectTypes: [all]
+frameworks: [nextjs, react, astro, remix]
+skills: []
+mcp: []
+tokenEstimate: 320
+tags: [performance, core-web-vitals, bundle, budget, floor]
+summary: >-
+  Treat Core Web Vitals (LCP, CLS, INP) and bundle size as hard budgets. A page over
+  budget is not finished, regardless of how it looks.
+prompt: >-
+  Keep client JS minimal and within budget. Prioritize the LCP image, size media, defer
+  below-fold work, and measure against the budget before shipping.
+specFile: spec.md

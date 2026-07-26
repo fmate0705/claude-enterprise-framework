@@ -1,8 +1,8 @@
-# CEF Framework manifest — the catalog the CLI reads to discover engines.
+# CEF Framework manifest — top-level metadata for the Framework Loader.
 #
-# The engine catalog is populated during the M1 migration of the existing `.claude/`
-# content into this package. An empty engine list here is an honest seed, not a
-# placeholder: the CLI's CapabilityLoader reads whatever is declared, and nothing is
-# hardcoded in the CLI (ARCHITECTURE.md §7, KD-4).
+# Capability modules are DISCOVERED from the modules/ directory; they are never hardcoded
+# in the loader (Framework Discovery, Phase 4). Each module carries its own metadata in a
+# module.yaml and its detailed specification in a lazily-loaded spec.md.
+name: Claude Enterprise Framework
 frameworkVersion: 2
-engines: []
+modulesDir: modules
