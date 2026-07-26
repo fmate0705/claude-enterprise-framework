@@ -47,6 +47,9 @@ importers:
       '@cef/core':
         specifier: workspace:*
         version: link:../core
+      '@cef/design-system':
+        specifier: workspace:*
+        version: link:../design-system
       '@cef/framework':
         specifier: workspace:*
         version: link:../framework
@@ -67,6 +70,12 @@ importers:
         version: 3.25.76
 
   packages/core: {}
+
+  packages/design-system:
+    dependencies:
+      '@cef/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/framework:
     dependencies:

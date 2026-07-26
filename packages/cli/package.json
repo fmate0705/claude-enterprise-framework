@@ -26,6 +26,7 @@
   "dependencies": {
     "@cef/claude": "workspace:*",
     "@cef/core": "workspace:*",
+    "@cef/design-system": "workspace:*",
     "@cef/framework": "workspace:*",
     "@cef/runtime": "workspace:*",
     "@clack/prompts": "^0.10.0",

@@ -1,0 +1,26 @@
+{
+  "name": "@cef/design-system",
+  "version": "0.0.0",
+  "description": "The CEF Design System & Component Engine — tokens, themes, brand, component/layout registries, and validation as the single source of truth for generated UI.",
+  "license": "MIT",
+  "author": "Klivo",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean"
+  },
+  "dependencies": {
+    "@cef/core": "workspace:*"
+  }
+}

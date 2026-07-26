@@ -9,6 +9,7 @@ import {
 } from '../commands/claude/index.js';
 import { CommandRegistry } from '../commands/command.js';
 import { CreateCommand } from '../commands/create/index.js';
+import { DesignCommand } from '../commands/design/index.js';
 import { FrameworkCommand } from '../commands/framework/index.js';
 import { RuntimeCommand } from '../commands/runtime/index.js';
 import { composeContainer, Tokens } from '../di.js';
@@ -34,7 +35,8 @@ async function main(): Promise<void> {
     .register(new MemoryCommand())
     .register(new SummaryCommand())
     .register(new SyncCommand())
-    .register(new StatusCommand());
+    .register(new StatusCommand())
+    .register(new DesignCommand());
 
   const program = buildProgram(registry, logger);
   await program.parseAsync(process.argv);

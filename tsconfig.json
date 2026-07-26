@@ -5,6 +5,7 @@
     { "path": "packages/framework" },
     { "path": "packages/runtime" },
     { "path": "packages/claude" },
+    { "path": "packages/design-system" },
     { "path": "packages/cli" }
   ]
 }
