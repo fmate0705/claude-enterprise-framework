@@ -4,6 +4,7 @@
     { "path": "packages/core" },
     { "path": "packages/framework" },
     { "path": "packages/runtime" },
+    { "path": "packages/claude" },
     { "path": "packages/cli" }
   ]
 }

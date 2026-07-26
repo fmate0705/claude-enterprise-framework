@@ -1,4 +1,12 @@
 #!/usr/bin/env node
+import {
+  ContextCommand,
+  MemoryCommand,
+  RoadmapCommand,
+  StatusCommand,
+  SummaryCommand,
+  SyncCommand,
+} from '../commands/claude/index.js';
 import { CommandRegistry } from '../commands/command.js';
 import { CreateCommand } from '../commands/create/index.js';
 import { FrameworkCommand } from '../commands/framework/index.js';
@@ -20,7 +28,13 @@ async function main(): Promise<void> {
   const registry = new CommandRegistry()
     .register(new CreateCommand(ports, readCliVersion()))
     .register(new RuntimeCommand())
-    .register(new FrameworkCommand());
+    .register(new FrameworkCommand())
+    .register(new ContextCommand())
+    .register(new RoadmapCommand())
+    .register(new MemoryCommand())
+    .register(new SummaryCommand())
+    .register(new SyncCommand())
+    .register(new StatusCommand());
 
   const program = buildProgram(registry, logger);
   await program.parseAsync(process.argv);

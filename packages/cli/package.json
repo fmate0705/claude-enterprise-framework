@@ -24,6 +24,7 @@
     "clean": "tsc -b --clean"
   },
   "dependencies": {
+    "@cef/claude": "workspace:*",
     "@cef/core": "workspace:*",
     "@cef/framework": "workspace:*",
     "@cef/runtime": "workspace:*",

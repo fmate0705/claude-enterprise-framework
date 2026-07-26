@@ -7,11 +7,6 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.test.ts", "dist"],
-  "references": [
-    { "path": "../core" },
-    { "path": "../runtime" },
-    { "path": "../framework" },
-    { "path": "../claude" }
-  ]
+  "exclude": ["src/**/*.test.ts", "src/testing/**", "dist"],
+  "references": [{ "path": "../core" }]
 }
