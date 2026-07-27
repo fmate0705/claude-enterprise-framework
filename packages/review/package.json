@@ -1,0 +1,28 @@
+{
+  "name": "@cef/review",
+  "version": "0.0.0",
+  "description": "The CEF Review & Approval Engine — QA, quality gates, scoring, client feedback, revisions, and human-in-the-loop release approval.",
+  "license": "MIT",
+  "author": "Klivo",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean"
+  },
+  "dependencies": {
+    "@cef/core": "workspace:*",
+    "@cef/design-system": "workspace:*",
+    "@cef/intelligence": "workspace:*"
+  }
+}

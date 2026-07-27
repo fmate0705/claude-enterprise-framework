@@ -7,15 +7,10 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.test.ts", "dist"],
+  "exclude": ["src/**/*.test.ts", "src/testing/**", "dist"],
   "references": [
     { "path": "../core" },
-    { "path": "../runtime" },
-    { "path": "../framework" },
-    { "path": "../claude" },
     { "path": "../design-system" },
-    { "path": "../intelligence" },
-    { "path": "../generator" },
-    { "path": "../review" }
+    { "path": "../intelligence" }
   ]
 }

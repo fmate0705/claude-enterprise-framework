@@ -59,6 +59,9 @@ importers:
       '@cef/intelligence':
         specifier: workspace:*
         version: link:../intelligence
+      '@cef/review':
+        specifier: workspace:*
+        version: link:../review
       '@cef/runtime':
         specifier: workspace:*
         version: link:../runtime
@@ -112,6 +115,18 @@ importers:
       '@cef/core':
         specifier: workspace:*
         version: link:../core
+
+  packages/review:
+    dependencies:
+      '@cef/core':
+        specifier: workspace:*
+        version: link:../core
+      '@cef/design-system':
+        specifier: workspace:*
+        version: link:../design-system
+      '@cef/intelligence':
+        specifier: workspace:*
+        version: link:../intelligence
 
   packages/runtime:
     dependencies:

@@ -17,6 +17,15 @@ import {
   ValidateCommand,
 } from '../commands/generate/index.js';
 import {
+  ApproveCommand,
+  AuditCommand,
+  FeedbackCommand,
+  QaCommand,
+  ReleaseCheckCommand,
+  ReviewCommand,
+  ScoreCommand,
+} from '../commands/review/index.js';
+import {
   AnalyzeCommand,
   AudienceCommand,
   BlueprintCommand,
@@ -60,7 +69,14 @@ async function main(): Promise<void> {
     .register(new GenerateCommand())
     .register(new ValidateCommand())
     .register(new RepairCommand())
-    .register(new ExportCommand());
+    .register(new ExportCommand())
+    .register(new ReviewCommand())
+    .register(new QaCommand())
+    .register(new AuditCommand())
+    .register(new ScoreCommand())
+    .register(new ReleaseCheckCommand())
+    .register(new ApproveCommand())
+    .register(new FeedbackCommand());
 
   const program = buildProgram(registry, logger);
   await program.parseAsync(process.argv);

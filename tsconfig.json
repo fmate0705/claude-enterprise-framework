@@ -8,6 +8,7 @@
     { "path": "packages/design-system" },
     { "path": "packages/intelligence" },
     { "path": "packages/generator" },
+    { "path": "packages/review" },
     { "path": "packages/cli" }
   ]
 }
