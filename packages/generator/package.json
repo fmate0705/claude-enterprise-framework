@@ -1,13 +1,10 @@
 {
-  "name": "@cef/cli",
+  "name": "@cef/generator",
   "version": "0.0.0",
-  "description": "The Claude Enterprise Framework command-line application.",
+  "description": "The CEF Generation Pipeline — converts a blueprint into a production-ready application through independent, rerunnable stages.",
   "license": "MIT",
   "author": "Klivo",
   "type": "module",
-  "bin": {
-    "cef": "./dist/bin/cef.js"
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -24,16 +21,8 @@
     "clean": "tsc -b --clean"
   },
   "dependencies": {
-    "@cef/claude": "workspace:*",
     "@cef/core": "workspace:*",
     "@cef/design-system": "workspace:*",
-    "@cef/framework": "workspace:*",
-    "@cef/generator": "workspace:*",
-    "@cef/intelligence": "workspace:*",
-    "@cef/runtime": "workspace:*",
-    "@clack/prompts": "^0.10.0",
-    "commander": "^13.1.0",
-    "yaml": "^2.6.1",
-    "zod": "^3.24.1"
+    "@cef/intelligence": "workspace:*"
   }
 }

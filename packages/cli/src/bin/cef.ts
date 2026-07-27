@@ -11,6 +11,12 @@ import { CommandRegistry } from '../commands/command.js';
 import { CreateCommand } from '../commands/create/index.js';
 import { DesignCommand } from '../commands/design/index.js';
 import {
+  ExportCommand,
+  GenerateCommand,
+  RepairCommand,
+  ValidateCommand,
+} from '../commands/generate/index.js';
+import {
   AnalyzeCommand,
   AudienceCommand,
   BlueprintCommand,
@@ -50,7 +56,11 @@ async function main(): Promise<void> {
     .register(new PagesCommand())
     .register(new FeaturesCommand())
     .register(new SeoCommand())
-    .register(new AudienceCommand());
+    .register(new AudienceCommand())
+    .register(new GenerateCommand())
+    .register(new ValidateCommand())
+    .register(new RepairCommand())
+    .register(new ExportCommand());
 
   const program = buildProgram(registry, logger);
   await program.parseAsync(process.argv);
