@@ -1,0 +1,26 @@
+{
+  "name": "@cef/intelligence",
+  "version": "0.0.0",
+  "description": "The CEF Project Intelligence & Planning Engine — analyzes what to build and produces a structured implementation blueprint.",
+  "license": "MIT",
+  "author": "Klivo",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean"
+  },
+  "dependencies": {
+    "@cef/core": "workspace:*"
+  }
+}

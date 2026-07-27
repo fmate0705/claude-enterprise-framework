@@ -10,6 +10,14 @@ import {
 import { CommandRegistry } from '../commands/command.js';
 import { CreateCommand } from '../commands/create/index.js';
 import { DesignCommand } from '../commands/design/index.js';
+import {
+  AnalyzeCommand,
+  AudienceCommand,
+  BlueprintCommand,
+  FeaturesCommand,
+  PagesCommand,
+  SeoCommand,
+} from '../commands/intelligence/index.js';
 import { FrameworkCommand } from '../commands/framework/index.js';
 import { RuntimeCommand } from '../commands/runtime/index.js';
 import { composeContainer, Tokens } from '../di.js';
@@ -36,7 +44,13 @@ async function main(): Promise<void> {
     .register(new SummaryCommand())
     .register(new SyncCommand())
     .register(new StatusCommand())
-    .register(new DesignCommand());
+    .register(new DesignCommand())
+    .register(new AnalyzeCommand())
+    .register(new BlueprintCommand())
+    .register(new PagesCommand())
+    .register(new FeaturesCommand())
+    .register(new SeoCommand())
+    .register(new AudienceCommand());
 
   const program = buildProgram(registry, logger);
   await program.parseAsync(process.argv);

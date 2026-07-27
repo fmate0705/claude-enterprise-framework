@@ -53,6 +53,9 @@ importers:
       '@cef/framework':
         specifier: workspace:*
         version: link:../framework
+      '@cef/intelligence':
+        specifier: workspace:*
+        version: link:../intelligence
       '@cef/runtime':
         specifier: workspace:*
         version: link:../runtime
@@ -88,6 +91,12 @@ importers:
       zod:
         specifier: ^3.24.1
         version: 3.25.76
+
+  packages/intelligence:
+    dependencies:
+      '@cef/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/runtime:
     dependencies:

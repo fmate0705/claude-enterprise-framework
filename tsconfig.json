@@ -6,6 +6,7 @@
     { "path": "packages/runtime" },
     { "path": "packages/claude" },
     { "path": "packages/design-system" },
+    { "path": "packages/intelligence" },
     { "path": "packages/cli" }
   ]
 }

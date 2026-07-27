@@ -28,6 +28,7 @@
     "@cef/core": "workspace:*",
     "@cef/design-system": "workspace:*",
     "@cef/framework": "workspace:*",
+    "@cef/intelligence": "workspace:*",
     "@cef/runtime": "workspace:*",
     "@clack/prompts": "^0.10.0",
     "commander": "^13.1.0",

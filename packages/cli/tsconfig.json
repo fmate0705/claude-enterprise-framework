@@ -13,6 +13,7 @@
     { "path": "../runtime" },
     { "path": "../framework" },
     { "path": "../claude" },
-    { "path": "../design-system" }
+    { "path": "../design-system" },
+    { "path": "../intelligence" }
   ]
 }
