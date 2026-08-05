@@ -5,3 +5,4 @@ export * from './page-builder.js';
 export * from './seo-builder.js';
 export * from './content-builder.js';
 export * from './asset-builder.js';
+export * from './deployment-builder.js';

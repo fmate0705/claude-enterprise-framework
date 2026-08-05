@@ -6,7 +6,7 @@ export interface PipelineValidationReport {
   readonly issues: readonly StageIssue[];
 }
 
-/** The eleven stages the pipeline must contain, in order. */
+/** The twelve stages the pipeline must contain, in order. */
 const EXPECTED = [
   'architecture',
   'layout',
@@ -15,6 +15,7 @@ const EXPECTED = [
   'seo',
   'content',
   'asset',
+  'deployment',
   'validation',
   'review',
   'repair',

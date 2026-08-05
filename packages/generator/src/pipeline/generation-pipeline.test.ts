@@ -7,7 +7,7 @@ describe('GenerationPipeline', () => {
   const blueprint = legalBlueprint();
   const options = legalOptions();
 
-  it('runs all eleven stages to completion', () => {
+  it('runs all twelve stages to completion', () => {
     const session = pipeline.generate(blueprint, options);
     expect(session.states.map((s) => s.stageId)).toEqual([
       'architecture',
@@ -17,6 +17,7 @@ describe('GenerationPipeline', () => {
       'seo',
       'content',
       'asset',
+      'deployment',
       'validation',
       'review',
       'repair',

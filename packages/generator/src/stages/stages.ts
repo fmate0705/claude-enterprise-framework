@@ -3,6 +3,7 @@ import {
   AssetBuilder,
   ComponentBuilder,
   ContentBuilder,
+  DeploymentBuilder,
   LayoutBuilder,
   PageBuilder,
   SEOBuilder,
@@ -127,7 +128,21 @@ export class AssetStage implements PipelineStage {
   }
 }
 
-/** Stage 8 — Validation: accessibility, SEO, imports, routes, metadata, design tokens. */
+/** Stage 8 — Deployment: the Docker deploy bundle for the hosting platform. */
+export class DeploymentStage implements PipelineStage {
+  readonly id = 'deployment';
+  readonly name = 'Deployment Builder';
+  run(context: GenerationContext): StageResult {
+    const files = new DeploymentBuilder().build(context);
+    return result(this, {
+      files,
+      artifacts: files.map((file) => artifact('docker', file.path, this.id)),
+      summary: `Docker deploy bundle for the hosting platform (${files.length} files).`,
+    });
+  }
+}
+
+/** Stage 9 — Validation: accessibility, SEO, imports, routes, metadata, design tokens. */
 export class ValidationStage implements PipelineStage {
   readonly id = 'validation';
   readonly name = 'Validation';
@@ -141,7 +156,7 @@ export class ValidationStage implements PipelineStage {
   }
 }
 
-/** Stage 9 — Review: consistency, duplicate components, design integrity, architecture. */
+/** Stage 10 — Review: consistency, duplicate components, design integrity, architecture. */
 export class ReviewStage implements PipelineStage {
   readonly id = 'review';
   readonly name = 'Review';
@@ -154,7 +169,7 @@ export class ReviewStage implements PipelineStage {
   }
 }
 
-/** Stage 10 — Repair: safe, deterministic fixes (formatting, missing metadata). */
+/** Stage 11 — Repair: safe, deterministic fixes (formatting, missing metadata). */
 export class RepairStage implements PipelineStage {
   readonly id = 'repair';
   readonly name = 'Repair';
@@ -168,7 +183,7 @@ export class RepairStage implements PipelineStage {
   }
 }
 
-/** Stage 11 — Export: the final generation report (JSON + Markdown). */
+/** Stage 12 — Export: the final generation report (JSON + Markdown). */
 export class ExportStage implements PipelineStage {
   readonly id = 'export';
   readonly name = 'Export';
@@ -183,7 +198,7 @@ export class ExportStage implements PipelineStage {
   }
 }
 
-/** The eleven pipeline stages, in execution order. */
+/** The twelve pipeline stages, in execution order. */
 export function allStages(): readonly PipelineStage[] {
   return [
     new ArchitectureStage(),
@@ -193,6 +208,7 @@ export function allStages(): readonly PipelineStage[] {
     new SeoStage(),
     new ContentStage(),
     new AssetStage(),
+    new DeploymentStage(),
     new ValidationStage(),
     new ReviewStage(),
     new RepairStage(),

@@ -8,6 +8,10 @@ const GEN_OPTIONS = [
   { flags: '--dir <path>', description: 'project directory (default: current directory)' },
   { flags: '--theme <id>', description: 'design theme id (default: base)' },
   { flags: '--url <url>', description: 'public base URL for canonical/sitemap/OG' },
+  {
+    flags: '--client-slug <slug>',
+    description: 'hosting platform client slug for the deploy files (default: project slug)',
+  },
 ];
 
 /** target → stage id for partial generation. */
@@ -16,6 +20,7 @@ const STAGE_FOR: Readonly<Record<string, string>> = {
   components: 'component',
   seo: 'seo',
   assets: 'asset',
+  deploy: 'deployment',
 };
 
 function reportLines(report: GenerationReport): string {
@@ -33,7 +38,10 @@ export class GenerateCommand implements Command {
     name: 'generate',
     description: 'Generate the site from the blueprint (optionally a single part).',
     arguments: [
-      { name: '[target]', description: 'pages | components | seo | assets (default: all)' },
+      {
+        name: '[target]',
+        description: 'pages | components | seo | assets | deploy (default: all)',
+      },
     ],
     options: GEN_OPTIONS,
   };
@@ -60,7 +68,7 @@ export class GenerateCommand implements Command {
     if (!stageId) {
       return err(
         cefError('INVALID_INPUT', `Unknown generate target "${target}".`, {
-          hint: 'Use pages | components | seo | assets, or omit for all.',
+          hint: 'Use pages | components | seo | assets | deploy, or omit for all.',
         }),
       );
     }

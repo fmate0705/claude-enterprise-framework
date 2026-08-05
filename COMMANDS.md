@@ -275,25 +275,53 @@ cef audience
 
 ## Generation (build the site)
 
-These commands run the 11‑stage generation pipeline. They read the manifest's
+These commands run the 12‑stage generation pipeline. They read the manifest's
 `metadata.description` (there is no `--description` flag here), so set it in the
 manifest first for industry‑specific output.
 
-Shared options: `--dir`, `--theme <id>`, `--url <base-url>`.
+Shared options: `--dir`, `--theme <id>`, `--url <base-url>`, `--client-slug <slug>`.
 
 ### `cef generate [target]`
 
 Generate the whole site, or a single part. Writes a production‑ready Next.js App
-Router project plus `.cef/generated/generation-report.{json,md}`.
+Router project (including the Docker deploy bundle) plus
+`.cef/generated/generation-report.{json,md}`.
 
 - no target — generate everything.
-- `pages` / `components` / `seo` / `assets` — regenerate just that part.
+- `pages` / `components` / `seo` / `assets` / `deploy` — regenerate just that part.
+
+| Option | Description |
+| --- | --- |
+| `--theme <id>` | Design theme id (e.g. `legal`, `corporate`) |
+| `--url <url>` | Public base URL for canonical/sitemap/OG |
+| `--client-slug <slug>` | Hosting‑platform client slug for the deploy files (default: project slug) |
 
 ```bash
-cef generate --theme legal --url https://acme.law
+cef generate --theme legal --url https://acme.law --client-slug acme-law
 cef generate seo               # regenerate only the SEO files
-cef generate components        # regenerate only the components
+cef generate deploy            # regenerate only the Docker deploy bundle
 ```
+
+#### Deployment bundle
+
+Stage 8 (`deployment`) emits everything needed to deploy on the **Klivo Docker
+hosting platform** (Traefik reverse proxy, one container per site):
+
+- `Dockerfile` — a multi‑stage **Next.js standalone** build; the runtime listens
+  on **port 80** (`next.config.mjs` sets `output: 'standalone'`).
+- `docker-compose.yml` — matches the platform contract exactly: service/container
+  `hosting_<slug>_web`, the external network `client_<slug>_net`, `env_file: .env`,
+  `expose: "80"`, and capped json‑file logs. It carries **no Docker labels** —
+  the platform routes through Traefik's file provider, not labels.
+- `.dockerignore` — keeps `.env`, `.git`, `node_modules`, and `.next` out of the
+  build context.
+- `deploy/DEPLOY.md` — the deploy runbook (create the client with the matching
+  slug, container port 80, set env in the panel, push the repo).
+
+The container/network names embed the platform **client slug**; pass
+`--client-slug <slug>` so they match the client you create in the panel (default
+is the project slug). The generated compose passes the platform's own compose
+security validator.
 
 ### `cef validate`
 
@@ -520,12 +548,13 @@ output; nothing is invented out of band.
    (cef design)   • strongly-typed tokens, WCAG-AA themes
       │           • component & layout registries, presets
       ▼
- Generation ────▶ Next.js App Router site      11 independent, rerunnable stages
-   (cef generate) 1 architecture   5 seo        9 review
-      │           2 layout         6 content   10 repair
-      │           3 component      7 asset     11 export
-      │           4 page           8 validation
-      │           Pages are generated ONLY from the blueprint.
+ Generation ────▶ Next.js App Router site      12 independent, rerunnable stages
+   (cef generate) 1 architecture   5 seo        9 validation
+      │           2 layout         6 content   10 review
+      │           3 component      7 asset     11 repair
+      │           4 page           8 deployment 12 export
+      │           Pages are generated ONLY from the blueprint; stage 8 emits the
+      │           Docker deploy bundle (Dockerfile + compose) for the host.
       ▼
  Review ────────▶ 12 quality gates + score     generation ≠ approval
    (cef review/qa/audit/score)

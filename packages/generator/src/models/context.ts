@@ -10,6 +10,12 @@ export interface GenerationOptions {
   readonly presetId: string | undefined;
   readonly themeId: string;
   readonly baseUrl: string;
+  /**
+   * The hosting platform's client slug, used to name the deploy container
+   * (`hosting_<slug>_web`) and network (`client_<slug>_net`). Defaults to the
+   * project slug when unset; override to match an existing platform client.
+   */
+  readonly deploySlug?: string;
   /** Injected so generated timestamps are deterministic. */
   readonly generatedAt: string;
 }

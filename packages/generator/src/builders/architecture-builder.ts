@@ -124,6 +124,8 @@ const TSCONFIG = `${JSON.stringify(
 const NEXT_CONFIG = `/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Self-contained server build — required for the deploy Dockerfile.
+  output: 'standalone',
   images: { formats: ['image/avif', 'image/webp'] },
 };
 

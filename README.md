@@ -41,7 +41,7 @@ a pure function of its inputs, so the same project always produces the same outp
 | **Scaffold** | `cef create` | A new project + `.cef/manifest.yaml` |
 | **Plan** | `cef analyze`, `blueprint`, `pages`, `features`, `seo`, `audience` | A structured blueprint (what to build, and why) |
 | **Design** | `cef design` | Strongly‑typed tokens, WCAG‑AA themes, component registry |
-| **Generate** | `cef generate`, `validate`, `repair`, `export` | A production‑ready Next.js App Router site (11 stages) |
+| **Generate** | `cef generate`, `validate`, `repair`, `export` | A production‑ready Next.js App Router site + Docker deploy bundle (12 stages) |
 | **Review** | `cef review`, `qa`, `audit`, `score`, `release-check` | Twelve quality gates + a readiness score |
 | **Approve** | `cef approve`, `feedback` | An immutable, human‑approved release trail |
 

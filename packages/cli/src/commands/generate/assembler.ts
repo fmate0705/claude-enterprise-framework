@@ -47,6 +47,9 @@ export async function prepareGeneration(
     themeId: typeof input.options['theme'] === 'string' ? input.options['theme'] : 'base',
     baseUrl:
       typeof input.options['url'] === 'string' ? input.options['url'] : 'https://example.com',
+    ...(typeof input.options['clientSlug'] === 'string'
+      ? { deploySlug: input.options['clientSlug'] }
+      : {}),
     generatedAt,
   };
 
